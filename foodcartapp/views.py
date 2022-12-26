@@ -60,5 +60,10 @@ def product_list_api(request):
 
 def register_order(request):
     # TODO это лишь заглушка
-    
+
+    print(json.dumps(
+        json.loads(request.body.decode()),
+        indent=4
+    ))
+
     return JsonResponse({})
