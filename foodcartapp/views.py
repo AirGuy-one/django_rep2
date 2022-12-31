@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 from django.templatetags.static import static
-
-
 from .models import Product
+from .models import Order
+from .models import ProductsInOrder
 import json
 
 
@@ -59,11 +59,20 @@ def product_list_api(request):
 
 
 def register_order(request):
-    # TODO это лишь заглушка
+    order_info = json.loads(request.body.decode())
 
-    print(json.dumps(
-        json.loads(request.body.decode()),
-        indent=4
-    ))
+    current_order = Order.objects.create(
+        address=order_info['address'],
+        first_name=order_info['firstname'],
+        last_name=order_info['lastname'],
+        phone_number=order_info['phonenumber'],
+    )
+
+    for product_info in order_info['products']:
+        ProductsInOrder.objects.create(
+            product=Product.objects.get(pk=product_info['product']),
+            quantity=product_info['quantity'],
+            order=current_order
+        )
 
     return JsonResponse({})

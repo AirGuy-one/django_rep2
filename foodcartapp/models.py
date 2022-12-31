@@ -13,7 +13,7 @@ class Restaurant(models.Model):
         max_length=100,
         blank=True,
     )
-    contact_phone = PhoneNumberField(
+    contact_phone = models.CharField(
         'контактный телефон',
         max_length=50,
         blank=True,
@@ -122,3 +122,49 @@ class RestaurantMenuItem(models.Model):
 
     def __str__(self):
         return f"{self.restaurant.name} - {self.product.name}"
+
+
+class Order(models.Model):
+    address = models.CharField(
+        'адрес',
+        max_length=255
+    )
+    first_name = models.CharField(
+        'имя',
+        max_length=255
+    )
+    last_name = models.CharField(
+        'фамилия',
+        max_length=255
+    )
+    phone_number = PhoneNumberField(
+        'контактный телефон',
+    )
+
+    class Meta:
+        verbose_name = 'заказ'
+        verbose_name_plural = 'заказы'
+
+    def __str__(self):
+        return f'Заказ номер {self.id} оформил(а) {self.first_name} {self.last_name}'
+
+
+class ProductsInOrder(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='orders'
+    )
+    quantity = models.IntegerField()
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='products'
+    )
+
+    class Meta:
+        verbose_name = 'Элемент заказа'
+        verbose_name_plural = 'Элементы заказа'
+
+    def __str__(self):
+        return f'Этот продукт относится к заказу под номером {self.order.id}'
