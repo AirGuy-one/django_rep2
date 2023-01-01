@@ -1,9 +1,12 @@
 from django.http import JsonResponse
 from django.templatetags.static import static
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 from .models import Product
 from .models import Order
 from .models import ProductsInOrder
-import json
 
 
 def banners_list_api(request):
@@ -58,21 +61,31 @@ def product_list_api(request):
     })
 
 
+@api_view(['POST'])
 def register_order(request):
-    order_info = json.loads(request.body.decode())
+    if request.method == 'POST':
+        order_info = request.data
 
-    current_order = Order.objects.create(
-        address=order_info['address'],
-        first_name=order_info['firstname'],
-        last_name=order_info['lastname'],
-        phone_number=order_info['phonenumber'],
-    )
+        if 'address' in order_info and 'firstname' in order_info and \
+            'lastname' in order_info and 'phonenumber' in order_info and \
+            'products' in order_info and isinstance(order_info['address'], str) and \
+            isinstance(order_info['firstname'], str) and isinstance(order_info['lastname'], str) and \
+            isinstance(order_info['phonenumber'], str) and isinstance(order_info['products'], list) and \
+            order_info['products']:
+            current_order = Order.objects.create(
+                address=order_info['address'],
+                first_name=order_info['firstname'],
+                last_name=order_info['lastname'],
+                phone_number=order_info['phonenumber'],
+            )
 
-    for product_info in order_info['products']:
-        ProductsInOrder.objects.create(
-            product=Product.objects.get(pk=product_info['product']),
-            quantity=product_info['quantity'],
-            order=current_order
-        )
+            for product_info in order_info['products']:
+                ProductsInOrder.objects.create(
+                    product=Product.objects.get(pk=product_info['product']),
+                    quantity=product_info['quantity'],
+                    order=current_order
+                )
 
-    return JsonResponse({})
+            return Response(request.data, status=status.HTTP_200_OK)
+
+        return Response(request.data, status=status.HTTP_400_BAD_REQUEST)
