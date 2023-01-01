@@ -66,12 +66,30 @@ def register_order(request):
     if request.method == 'POST':
         order_info = request.data
 
-        if 'address' in order_info and 'firstname' in order_info and \
-            'lastname' in order_info and 'phonenumber' in order_info and \
-            'products' in order_info and isinstance(order_info['address'], str) and \
-            isinstance(order_info['firstname'], str) and isinstance(order_info['lastname'], str) and \
-            isinstance(order_info['phonenumber'], str) and isinstance(order_info['products'], list) and \
-            order_info['products']:
+        product_ids = []
+        for product in Product.objects.all():
+            product_ids.append(product.id)
+
+        if 'address' in order_info and \
+            isinstance(order_info['address'], str) and \
+            order_info['address'] != '' and \
+            'firstname' in order_info and \
+            isinstance(order_info['firstname'], str) and \
+            order_info['firstname'] != '' and \
+            'lastname' in order_info and \
+            isinstance(order_info['lastname'], str) and \
+            order_info['lastname'] != '' and \
+            'phonenumber' in order_info and \
+            order_info['phonenumber'] != '' and \
+            order_info['phonenumber'][:3] == '+79' and \
+            isinstance(order_info['phonenumber'], str) and \
+            'products' in order_info and \
+            isinstance(order_info['products'], list) and \
+            order_info['products'] and \
+            isinstance(order_info['products'][0]['product'], int) and \
+            order_info['products'][0]['product'] in product_ids and \
+            isinstance(order_info['products'][0]['quantity'], int):
+
             current_order = Order.objects.create(
                 address=order_info['address'],
                 first_name=order_info['firstname'],
