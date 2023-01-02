@@ -1,0 +1,25 @@
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
+from .models import Order, ProductsInOrder
+
+
+class ProductsInOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductsInOrder
+        fields = ['product', 'quantity']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    products = serializers.ListField(
+        child=ProductsInOrderSerializer()
+    )
+
+    class Meta:
+        model = Order
+        fields = ['address', 'firstname', 'lastname', 'phonenumber', 'products']
+
+    def validate_products(self, products):
+        if not products:
+            raise ValidationError('Этот список не может быть пустым')
+        return products
