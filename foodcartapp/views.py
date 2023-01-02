@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 from django.templatetags.static import static
+from django.forms.models import model_to_dict
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from .models import Product
@@ -73,9 +73,9 @@ def register_order(request):
 
         current_order = Order.objects.create(
             address=request.data['address'],
-            first_name=request.data['firstname'],
-            last_name=request.data['lastname'],
-            phone_number=request.data['phonenumber'],
+            firstname=request.data['firstname'],
+            lastname=request.data['lastname'],
+            phonenumber=request.data['phonenumber'],
         )
 
         for product in products:
@@ -85,4 +85,7 @@ def register_order(request):
                 order=current_order
             )
 
-        return Response(request.data, status=status.HTTP_200_OK)
+        # current_order = model_to_dict(current_order, fields=['id', 'firstname', 'lastname', 'address'])
+        serialized_current_order = OrderSerializer(current_order).data
+
+        return Response(serialized_current_order, status=status.HTTP_200_OK)
