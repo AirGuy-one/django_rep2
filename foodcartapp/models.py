@@ -151,6 +151,10 @@ class Order(models.Model):
         choices=ORDER_STATUSES,
         default='UNPROCESSED'
     )
+    comment = models.TextField(
+        'комментарий',
+        default=''
+    )
 
     class Meta:
         verbose_name = 'заказ'
