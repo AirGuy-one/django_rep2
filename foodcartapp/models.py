@@ -125,6 +125,11 @@ class RestaurantMenuItem(models.Model):
 
 
 class Order(models.Model):
+    ORDER_STATUSES = (
+        ('UNPROCESSED', 'Необработанный'),
+        ('PROCESSED', 'Обработанный'),
+    )
+
     address = models.CharField(
         'адрес',
         max_length=255
@@ -139,6 +144,12 @@ class Order(models.Model):
     )
     phonenumber = PhoneNumberField(
         'контактный телефон',
+    )
+    status = models.CharField(
+        'статус',
+        max_length=11,
+        choices=ORDER_STATUSES,
+        default='UNPROCESSED'
     )
 
     class Meta:

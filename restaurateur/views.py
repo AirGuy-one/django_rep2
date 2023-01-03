@@ -101,14 +101,15 @@ def view_orders(request):
 
     serialized_orders = OrderSerializer(orders, many=True).data
 
-    k = 0
+    order_number = 0
     for order in orders:
         products = order.products.all()
         cost = 0
         for product in products:
             cost += product.product.price * product.quantity
-        serialized_orders[k]['cost'] = cost
-        k += 1
+        serialized_orders[order_number]['cost'] = cost
+        serialized_orders[order_number]['status'] = order.get_status_display()
+        order_number += 1
 
     return render(request, template_name='order_items.html', context={
         'orders': serialized_orders
