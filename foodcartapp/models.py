@@ -153,7 +153,22 @@ class Order(models.Model):
     )
     comment = models.TextField(
         'комментарий',
-        default=''
+        default='',
+        blank=True
+    )
+    registered = models.DateTimeField(
+        'Оформлен',
+        auto_now_add=True
+    )
+    called = models.DateTimeField(
+        'Осуществлен звонок',
+        null=True,
+        blank=True
+    )
+    delivered = models.DateTimeField(
+        'Доставлен',
+        null=True,
+        blank=True
     )
 
     class Meta:

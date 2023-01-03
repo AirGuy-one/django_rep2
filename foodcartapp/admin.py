@@ -120,13 +120,16 @@ class OrderAdmin(admin.ModelAdmin):
         'firstname',
         'lastname',
         'address',
-        'phonenumber',
+        'phonenumber'
     ]
     list_display = [
         'firstname',
         'lastname',
         'address',
-        'phonenumber',
+        'phonenumber'
+    ]
+    readonly_fields = [
+        'registered'
     ]
     inlines = [
         ProductsInOrderInline
