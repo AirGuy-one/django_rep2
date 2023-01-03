@@ -109,6 +109,7 @@ def view_orders(request):
             cost += product.product.price * product.quantity
         serialized_orders[order_number]['cost'] = cost
         serialized_orders[order_number]['status'] = order.get_status_display()
+        serialized_orders[order_number]['payment_method'] = order.get_payment_method_display()
         order_number += 1
 
     return render(request, template_name='order_items.html', context={

@@ -130,6 +130,11 @@ class Order(models.Model):
         ('PROCESSED', 'Обработанный'),
     )
 
+    PAYMENT_METHODS = (
+        ('CASH', 'Наличностью'),
+        ('ELECTRONICALLY', 'Электронно'),
+    )
+
     address = models.CharField(
         'адрес',
         max_length=255
@@ -169,6 +174,12 @@ class Order(models.Model):
         'Доставлен',
         null=True,
         blank=True
+    )
+    payment_method = models.CharField(
+        'Способ оплаты',
+        max_length=14,
+        choices=PAYMENT_METHODS,
+        default='ELECTRONICALLY'
     )
 
     class Meta:
