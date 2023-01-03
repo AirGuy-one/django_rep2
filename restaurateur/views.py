@@ -3,13 +3,14 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
-
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
+from django.db.models import Sum
 
 
 from foodcartapp.models import Product, Restaurant
-from foodcartapp.models import Order
+from foodcartapp.models import Order, ProductsInOrder
+from foodcartapp.serializers import OrderSerializer, ProductsInOrderSerializer
 
 
 
@@ -96,6 +97,19 @@ def view_restaurants(request):
 def view_orders(request):
     orders = Order.objects.all()
 
+    serialized_orders = OrderSerializer(orders, many=True).data
+
+    k = 0
+    for order in orders:
+        products = order.products.all()
+        cost = 0
+        for product in products:
+            cost += product.product.price * product.quantity
+        serialized_orders[k]['cost'] = cost
+        k += 1
+
+    print(serialized_orders)
+
     return render(request, template_name='order_items.html', context={
-        'orders': orders
+        'orders': serialized_orders
     })

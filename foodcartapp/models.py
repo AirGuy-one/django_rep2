@@ -167,4 +167,4 @@ class ProductsInOrder(models.Model):
         verbose_name_plural = 'Элементы заказа'
 
     def __str__(self):
-        return f'Этот продукт относится к заказу под номером {self.order.id}'
+        return f'Продукт {self.product.name} относится к заказу под номером {self.order.id}'

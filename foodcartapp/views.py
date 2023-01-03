@@ -87,5 +87,6 @@ def register_order(request):
 
         # current_order = model_to_dict(current_order, fields=['id', 'firstname', 'lastname', 'address'])
         serialized_current_order = OrderSerializer(current_order).data
+        serialized_current_order['id'] = current_order.id
 
         return Response(serialized_current_order, status=status.HTTP_200_OK)
