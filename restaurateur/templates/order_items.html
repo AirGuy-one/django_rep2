@@ -38,8 +38,8 @@
         {% if not order.restaurant %}
           <td>Может быть приготовлен ресторанами:
             <ul>
-              {% for restaurant in order.restaurants_can_fulfill_order %}
-                <li>{{ restaurant }}</li>
+              {% for restaurant_distance_pair  in order.restaurants_can_fulfill_order %}
+                <li>{{ restaurant_distance_pair.restaurant }} - {{ restaurant_distance_pair.distance }} км</li>
               {% endfor %}
             </ul>
           </td>

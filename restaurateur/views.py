@@ -6,12 +6,14 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from django.db import transaction
+from geopy import distance
 
 
 from foodcartapp.models import Product
 from foodcartapp.models import Restaurant
 from foodcartapp.models import Order
 from foodcartapp.serializers import OrderSerializer
+from .fetch_coordinates import fetch_coordinates
 
 
 class Login(forms.Form):
@@ -96,10 +98,13 @@ def view_restaurants(request):
 @transaction.atomic
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
+    apikey = 'a211ff4a-bb2b-4840-a91b-993454b15f39'
+
     orders = Order.objects.all()
     restaurants = Restaurant.objects.all()
     products_in_restaurants = {}
 
+    # Here we collect a list of products for each restaurant
     for restaurant in restaurants:
         products = []
         for product in restaurant.menu_items.all():
@@ -122,11 +127,21 @@ def view_orders(request):
         serialized_orders[order_number]['payment_method'] = order.get_payment_method_display()
         serialized_orders[order_number]['restaurant'] = order.restaurant
 
+        customer_coords = fetch_coordinates(apikey, order.address)
+
         # Here we collect all the restaurants that can make this order
+        # Keys is names of restaurants and values is distances from customer to restaurant
         restaurants_can_fulfill_order = []
         for name_of_restaurant, products_in_restaurant in products_in_restaurants.items():
             if set(list_products).issubset(products_in_restaurant):
-                restaurants_can_fulfill_order.append(name_of_restaurant)
+                restaurant_coords = fetch_coordinates(apikey, name_of_restaurant)
+                restaurant_distance_pair = {
+                    'restaurant': name_of_restaurant,
+                    'distance': str(distance.distance(restaurant_coords,
+                                                      customer_coords).miles)[:-10]
+                }
+
+                restaurants_can_fulfill_order.append(restaurant_distance_pair)
 
         serialized_orders[order_number]['restaurants_can_fulfill_order'] = restaurants_can_fulfill_order
 
