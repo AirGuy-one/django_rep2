@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from django.db.models import Sum
+from django.db import transaction
 
 
 from foodcartapp.models import Product, Restaurant
@@ -93,6 +94,7 @@ def view_restaurants(request):
     })
 
 
+@transaction.atomic
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
     orders = Order.objects.all()
@@ -107,8 +109,6 @@ def view_orders(request):
             cost += product.product.price * product.quantity
         serialized_orders[k]['cost'] = cost
         k += 1
-
-    print(serialized_orders)
 
     return render(request, template_name='order_items.html', context={
         'orders': serialized_orders
