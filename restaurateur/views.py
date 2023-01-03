@@ -5,14 +5,13 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-from django.db.models import Sum
 from django.db import transaction
 
 
-from foodcartapp.models import Product, Restaurant
-from foodcartapp.models import Order, ProductsInOrder
-from foodcartapp.serializers import OrderSerializer, ProductsInOrderSerializer
-
+from foodcartapp.models import Product
+from foodcartapp.models import Restaurant
+from foodcartapp.models import Order
+from foodcartapp.serializers import OrderSerializer
 
 
 class Login(forms.Form):
@@ -98,20 +97,41 @@ def view_restaurants(request):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
     orders = Order.objects.all()
+    restaurants = Restaurant.objects.all()
+    products_in_restaurants = {}
+
+    for restaurant in restaurants:
+        products = []
+        for product in restaurant.menu_items.all():
+            products.append(product.product)
+        products_in_restaurants[restaurant.name] = products
 
     serialized_orders = OrderSerializer(orders, many=True).data
 
     order_number = 0
+
     for order in orders:
         products = order.products.all()
         cost = 0
+        list_products = []
         for product in products:
+            list_products.append(product.product)
             cost += product.product.price * product.quantity
         serialized_orders[order_number]['cost'] = cost
         serialized_orders[order_number]['status'] = order.get_status_display()
         serialized_orders[order_number]['payment_method'] = order.get_payment_method_display()
+        serialized_orders[order_number]['restaurant'] = order.restaurant
+
+        # Here we collect all the restaurants that can make this order
+        restaurants_can_fulfill_order = []
+        for name_of_restaurant, products_in_restaurant in products_in_restaurants.items():
+            if set(list_products).issubset(products_in_restaurant):
+                restaurants_can_fulfill_order.append(name_of_restaurant)
+
+        serialized_orders[order_number]['restaurants_can_fulfill_order'] = restaurants_can_fulfill_order
+
         order_number += 1
 
     return render(request, template_name='order_items.html', context={
-        'orders': serialized_orders
+        'orders': serialized_orders,
     })

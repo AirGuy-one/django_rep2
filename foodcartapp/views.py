@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 from django.templatetags.static import static
-from django.forms.models import model_to_dict
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -85,7 +84,6 @@ def register_order(request):
                 order=current_order
             )
 
-        # current_order = model_to_dict(current_order, fields=['id', 'firstname', 'lastname', 'address'])
         serialized_current_order = OrderSerializer(current_order).data
         serialized_current_order['id'] = current_order.id
 

@@ -97,9 +97,9 @@ class Product(models.Model):
 class RestaurantMenuItem(models.Model):
     restaurant = models.ForeignKey(
         Restaurant,
-        related_name='menu_items',
-        verbose_name="ресторан",
         on_delete=models.CASCADE,
+        related_name='menu_items',
+        verbose_name='ресторан',
     )
     product = models.ForeignKey(
         Product,
@@ -162,24 +162,32 @@ class Order(models.Model):
         blank=True
     )
     registered = models.DateTimeField(
-        'Оформлен',
+        'оформлен',
         auto_now_add=True
     )
     called = models.DateTimeField(
-        'Осуществлен звонок',
+        'осуществлен звонок',
         null=True,
         blank=True
     )
     delivered = models.DateTimeField(
-        'Доставлен',
+        'доставлен',
         null=True,
         blank=True
     )
     payment_method = models.CharField(
-        'Способ оплаты',
+        'способ оплаты',
         max_length=14,
         choices=PAYMENT_METHODS,
         default='ELECTRONICALLY'
+    )
+    restaurant = models.ForeignKey(
+        Restaurant,
+        on_delete=models.CASCADE,
+        related_name='orders',
+        verbose_name='ресторан',
+        null=True,
+        blank=True
     )
 
     class Meta:

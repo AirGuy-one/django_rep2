@@ -114,6 +114,11 @@ class ProductsInOrderInline(admin.TabularInline):
     extra = 0
 
 
+# class RestaurantMenuItemInline(admin.TabularInline):
+#     model = RestaurantMenuItem
+#     extra = 0
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     search_fields = [
@@ -132,7 +137,7 @@ class OrderAdmin(admin.ModelAdmin):
         'registered'
     ]
     inlines = [
-        ProductsInOrderInline
+        ProductsInOrderInline,
     ]
 
     def response_post_save_change(self, request, obj):
