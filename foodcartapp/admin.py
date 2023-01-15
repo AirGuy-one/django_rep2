@@ -134,7 +134,7 @@ class OrderAdmin(admin.ModelAdmin):
         'phonenumber'
     ]
     readonly_fields = [
-        'registered'
+        'registered_at'
     ]
     inlines = [
         ProductsInOrderInline,
