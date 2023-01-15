@@ -176,8 +176,7 @@ class Order(models.Model):
     payment_method = models.CharField(
         'способ оплаты',
         max_length=14,
-        choices=PAYMENT_METHODS,
-        default='ELECTRONICALLY'
+        choices=PAYMENT_METHODS
     )
     restaurant = models.ForeignKey(
         Restaurant,
