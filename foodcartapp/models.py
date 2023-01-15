@@ -156,7 +156,6 @@ class Order(models.Model):
     )
     comment = models.TextField(
         'комментарий',
-        default='',
         blank=True
     )
     registered_at = models.DateTimeField(
