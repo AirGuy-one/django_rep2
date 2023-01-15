@@ -103,7 +103,6 @@ class RestaurantMenuItem(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='menu_items',
         verbose_name='продукт',
     )
     availability = models.BooleanField(
@@ -201,7 +200,6 @@ class ProductInSomeOrder(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='orders',
         verbose_name='продукт'
     )
     quantity = models.IntegerField(
