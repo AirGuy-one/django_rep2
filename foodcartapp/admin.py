@@ -114,11 +114,6 @@ class ProductsInOrderInline(admin.TabularInline):
     extra = 0
 
 
-# class RestaurantMenuItemInline(admin.TabularInline):
-#     model = RestaurantMenuItem
-#     extra = 0
-
-
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     search_fields = [
