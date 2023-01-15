@@ -9,7 +9,7 @@ from .models import ProductCategory
 from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import Order
-from .models import ProductsInOrder
+from .models import ProductInSomeOrder
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -110,7 +110,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class ProductsInOrderInline(admin.TabularInline):
-    model = ProductsInOrder
+    model = ProductInSomeOrder
     extra = 0
 
 

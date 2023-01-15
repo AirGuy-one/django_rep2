@@ -59,7 +59,6 @@ class Product(models.Model):
     category = models.ForeignKey(
         ProductCategory,
         verbose_name='категория',
-        related_name='products',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -198,13 +197,16 @@ class Order(models.Model):
         return f'Заказ номер {self.id} оформил(а) {self.firstname} {self.lastname}'
 
 
-class ProductsInOrder(models.Model):
+class ProductInSomeOrder(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='orders'
+        related_name='orders',
+        verbose_name='продукт'
     )
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(
+        verbose_name='кол-во продуктов'
+    )
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,

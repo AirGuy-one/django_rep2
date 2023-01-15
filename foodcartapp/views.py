@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from .models import Product
 from .models import Order
-from .models import ProductsInOrder
+from .models import ProductInSomeOrder
 from .serializers import OrderSerializer
 
 
@@ -78,7 +78,7 @@ def register_order(request):
         )
 
         for product in products:
-            ProductsInOrder.objects.create(
+            ProductInSomeOrder.objects.create(
                 product=Product.objects.get(pk=product['product']),
                 quantity=product['quantity'],
                 order=current_order
