@@ -159,16 +159,16 @@ class Order(models.Model):
         default='',
         blank=True
     )
-    registered = models.DateTimeField(
+    registered_at = models.DateTimeField(
         'оформлен',
         auto_now_add=True
     )
-    called = models.DateTimeField(
+    called_at = models.DateTimeField(
         'осуществлен звонок',
         null=True,
         blank=True
     )
-    delivered = models.DateTimeField(
+    delivered_at = models.DateTimeField(
         'доставлен',
         null=True,
         blank=True
