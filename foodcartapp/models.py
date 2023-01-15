@@ -202,7 +202,7 @@ class ProductInSomeOrder(models.Model):
         on_delete=models.CASCADE,
         verbose_name='продукт'
     )
-    quantity = models.IntegerField(
+    quantity = models.PositiveIntegerField(
         verbose_name='кол-во продуктов'
     )
     order = models.ForeignKey(
