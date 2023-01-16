@@ -13,12 +13,14 @@ class ProductsInOrderSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.ListField(
         child=ProductsInOrderSerializer(),
-        write_only=True
+        write_only=True,
+        allow_empty=False,
     )
 
     class Meta:
         model = Order
         fields = [
+            'id',
             'address',
             'firstname',
             'lastname',
@@ -29,7 +31,8 @@ class OrderSerializer(serializers.ModelSerializer):
             'called_at',
             'delivered_at',
             'payment_method',
-            'restaurant'
+            'restaurant',
+            'products',
         ]
 
     def validate_products(self, products):

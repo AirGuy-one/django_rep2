@@ -103,6 +103,7 @@ class RestaurantMenuItem(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
+        related_name='menu_items',
         verbose_name='продукт',
     )
     availability = models.BooleanField(
@@ -175,7 +176,9 @@ class Order(models.Model):
     payment_method = models.CharField(
         'способ оплаты',
         max_length=14,
-        choices=PAYMENT_METHODS
+        choices=PAYMENT_METHODS,
+        null=True,
+        blank=True
     )
     restaurant = models.ForeignKey(
         Restaurant,

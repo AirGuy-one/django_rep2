@@ -134,7 +134,7 @@ def view_orders(request):
         restaurants_can_fulfill_order = []
         for name_of_restaurant, products_in_restaurant in products_in_restaurants.items():
             if set(list_products).issubset(products_in_restaurant):
-                restaurant_coords = fetch_coordinates(apikey, name_of_restaurant)
+                restaurant_coords = fetch_coordinates(apikey, Restaurant.objects.get(name=name_of_restaurant).address)
                 restaurant_distance_pair = {
                     'restaurant': name_of_restaurant,
                     'distance': str(distance.distance(restaurant_coords,
