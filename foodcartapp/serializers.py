@@ -18,7 +18,19 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = [
+            'address',
+            'firstname',
+            'lastname',
+            'phonenumber',
+            'status',
+            'comment',
+            'registered_at',
+            'called_at',
+            'delivered_at',
+            'payment_method',
+            'restaurant'
+        ]
 
     def validate_products(self, products):
         if not products:
