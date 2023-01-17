@@ -1,3 +1,5 @@
+import os
+
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
@@ -7,7 +9,6 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from django.db import transaction
 from geopy import distance
-
 
 from foodcartapp.models import Product
 from foodcartapp.models import Restaurant
@@ -98,7 +99,7 @@ def view_restaurants(request):
 @transaction.atomic
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    apikey = 'a211ff4a-bb2b-4840-a91b-993454b15f39'
+    apikey = os.environ['GEOCODE_APIKEY']
 
     orders = Order.objects.all()
     restaurants = Restaurant.objects.all()
