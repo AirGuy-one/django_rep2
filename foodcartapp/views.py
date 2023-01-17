@@ -64,27 +64,25 @@ def product_list_api(request):
 
 @api_view(['POST'])
 def register_order(request):
-    if request.method == 'POST':
+    serializer = OrderSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    products = request.data.get('products', [])
 
-        serializer = OrderSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        products = request.data.get('products', [])
+    current_order = Order.objects.create(
+        address=request.data['address'],
+        firstname=request.data['firstname'],
+        lastname=request.data['lastname'],
+        phonenumber=request.data['phonenumber'],
+    )
 
-        current_order = Order.objects.create(
-            address=request.data['address'],
-            firstname=request.data['firstname'],
-            lastname=request.data['lastname'],
-            phonenumber=request.data['phonenumber'],
+    for product in products:
+        ProductInSomeOrder.objects.create(
+            product=Product.objects.get(pk=product['product']),
+            quantity=product['quantity'],
+            order=current_order
         )
 
-        for product in products:
-            ProductInSomeOrder.objects.create(
-                product=Product.objects.get(pk=product['product']),
-                quantity=product['quantity'],
-                order=current_order
-            )
+    serialized_current_order = OrderSerializer(current_order).data
+    serialized_current_order['id'] = current_order.id
 
-        serialized_current_order = OrderSerializer(current_order).data
-        serialized_current_order['id'] = current_order.id
-
-        return Response(serialized_current_order, status=status.HTTP_200_OK)
+    return Response(serialized_current_order, status=status.HTTP_200_OK)

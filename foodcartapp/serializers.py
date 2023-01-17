@@ -34,8 +34,3 @@ class OrderSerializer(serializers.ModelSerializer):
             'restaurant',
             'products',
         ]
-
-    def validate_products(self, products):
-        if not products:
-            raise ValidationError('Этот список не может быть пустым')
-        return products
