@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from django.db import transaction
 from geopy import distance
+from dotenv import load_dotenv
 
 from foodcartapp.models import Product
 from foodcartapp.models import Restaurant
@@ -99,6 +100,8 @@ def view_restaurants(request):
 @transaction.atomic
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
+    load_dotenv()
+
     apikey = os.environ['GEOCODE_APIKEY']
 
     orders = Order.objects.all()

@@ -64,25 +64,24 @@ def product_list_api(request):
 
 @api_view(['POST'])
 def register_order(request):
-    serializer = OrderSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    products = request.data.get('products', [])
+    serialized_current_order = OrderSerializer(data=request.data)
+    serialized_current_order.is_valid(raise_exception=True)
 
     current_order = Order.objects.create(
-        address=request.data['address'],
-        firstname=request.data['firstname'],
-        lastname=request.data['lastname'],
-        phonenumber=request.data['phonenumber'],
+        address=serialized_current_order.validated_data['address'],
+        firstname=serialized_current_order.validated_data['firstname'],
+        lastname=serialized_current_order.validated_data['lastname'],
+        phonenumber=serialized_current_order.validated_data['phonenumber']
     )
 
-    for product in products:
+    for product in serialized_current_order.validated_data['products']:
         ProductInSomeOrder.objects.create(
-            product=Product.objects.get(pk=product['product']),
+            product=product['product'],
             quantity=product['quantity'],
             order=current_order
         )
 
-    serialized_current_order = OrderSerializer(current_order).data
-    serialized_current_order['id'] = current_order.id
+    serialized_current_order_json = serialized_current_order.data
+    serialized_current_order_json['id'] = current_order.id
 
-    return Response(serialized_current_order, status=status.HTTP_200_OK)
+    return Response(serialized_current_order_json, status=status.HTTP_200_OK)

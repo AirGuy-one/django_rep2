@@ -209,7 +209,7 @@ class ProductInSomeOrder(models.Model):
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
-        related_name='products'
+        related_name='products_in_some_order'
     )
 
     class Meta:
