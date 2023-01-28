@@ -4,7 +4,7 @@ from django.templatetags.static import static
 from django.utils.html import format_html
 from django.http import HttpResponseRedirect
 
-from .models import Product
+from .models import Product, RestaurantCoordinates
 from .models import ProductCategory
 from .models import Restaurant
 from .models import RestaurantMenuItem

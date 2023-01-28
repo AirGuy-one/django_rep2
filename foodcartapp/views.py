@@ -74,12 +74,17 @@ def register_order(request):
         phonenumber=serialized_current_order.validated_data['phonenumber']
     )
 
+    current_order_list = []
     for product in serialized_current_order.validated_data['products']:
-        ProductInSomeOrder.objects.create(
-            product=product['product'],
-            quantity=product['quantity'],
-            order=current_order
+        current_order_list.append(
+            ProductInSomeOrder(
+                product=product['product'],
+                quantity=product['quantity'],
+                order=current_order
+            )
         )
+
+    ProductInSomeOrder.objects.bulk_create(current_order_list)
 
     serialized_current_order_json = serialized_current_order.data
     serialized_current_order_json['id'] = current_order.id

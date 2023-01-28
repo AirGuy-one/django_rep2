@@ -1,6 +1,7 @@
 import os
 
 from django import forms
+from django.db.models import Prefetch, Sum
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
@@ -11,7 +12,7 @@ from django.db import transaction
 from geopy import distance
 from dotenv import load_dotenv
 
-from foodcartapp.models import Product
+from foodcartapp.models import Product, ProductInSomeOrder, RestaurantMenuItem, RestaurantCoordinates
 from foodcartapp.models import Restaurant
 from foodcartapp.models import Order
 from foodcartapp.serializers import OrderSerializer
@@ -73,7 +74,7 @@ def is_manager(user):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_products(request):
     restaurants = list(Restaurant.objects.order_by('name'))
-    products = list(Product.objects.prefetch_related('menu_items'))
+    products = list(Product.objects.prefetch_related('menu_items').select_related('category'))
 
     products_with_restaurant_availability = []
     for product in products:
@@ -104,28 +105,42 @@ def view_orders(request):
 
     apikey = os.environ['GEOCODE_APIKEY']
 
-    orders = Order.objects.all()
-    restaurants = Restaurant.objects.all()
     products_in_restaurants = {}
 
-    # Here we collect a list of products for each restaurant
-    for restaurant in restaurants:
+    for restaurant in Restaurant.objects.prefetch_related(
+        Prefetch(
+            'menu_items__product',
+            queryset=RestaurantMenuItem.objects.all().only('product')
+        )
+    ).all().only('name'):
         products = []
-        for product in restaurant.menu_items.all():
-            products.append(product.product)
+        for menu_item in restaurant.menu_items.all():
+            products.append(menu_item.product.product)
+        # products = [menu_item.product.product for menu_item in restaurant.menu_items.all()]
         products_in_restaurants[restaurant.name] = products
 
-    serialized_orders = OrderSerializer(orders, many=True).data
-
+    serialized_orders = OrderSerializer(Order.objects.all().select_related('restaurant'), many=True).data
     order_number = 0
 
-    for order in orders:
-        products = order.products.all()
-        cost = 0
+    restaurants_addresses = list(RestaurantCoordinates.objects.all())
+
+    for order in Order.objects.prefetch_related(
+        Prefetch(
+            'products_in_some_order__product',
+        ),
+    ).all():
         list_products = []
-        for product in products:
+
+        for product in order.products_in_some_order.all():
             list_products.append(product.product)
-            cost += product.product.price * product.quantity
+
+        cost = order.products_in_some_order.get_product_type_cost().aggregate(
+            total_cost=Sum('cost')
+        )['total_cost']
+
+        if cost is None:
+            cost = 0
+
         serialized_orders[order_number]['cost'] = cost
         serialized_orders[order_number]['status'] = order.get_status_display()
         serialized_orders[order_number]['payment_method'] = order.get_payment_method_display()
@@ -133,12 +148,17 @@ def view_orders(request):
 
         customer_coords = fetch_coordinates(apikey, order.address)
 
-        # Here we collect all the restaurants that can make this order
-        # Keys is names of restaurants and values is distances from customer to restaurant
         restaurants_can_fulfill_order = []
+
+        restaurant_address_index = 0
+
         for name_of_restaurant, products_in_restaurant in products_in_restaurants.items():
             if set(list_products).issubset(products_in_restaurant):
-                restaurant_coords = fetch_coordinates(apikey, Restaurant.objects.get(name=name_of_restaurant).address)
+                restaurant_coords = (
+                    restaurants_addresses[restaurant_address_index].latitude,
+                    restaurants_addresses[restaurant_address_index].longitude
+                )
+
                 restaurant_distance_pair = {
                     'restaurant': name_of_restaurant,
                     'distance': str(distance.distance(restaurant_coords,
@@ -146,6 +166,8 @@ def view_orders(request):
                 }
 
                 restaurants_can_fulfill_order.append(restaurant_distance_pair)
+
+            restaurant_address_index += 1
 
         serialized_orders[order_number]['restaurants_can_fulfill_order'] = restaurants_can_fulfill_order
 

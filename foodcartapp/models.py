@@ -1,6 +1,15 @@
+import os
+
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.db.models import F
+from decimal import Decimal
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from phonenumber_field.modelfields import PhoneNumberField
+from dotenv import load_dotenv
+from restaurateur.fetch_coordinates import fetch_coordinates
 
 
 class Restaurant(models.Model):
@@ -25,6 +34,39 @@ class Restaurant(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class RestaurantCoordinates(models.Model):
+    restaurant = models.OneToOneField(
+        Restaurant,
+        on_delete=models.CASCADE,
+        related_name='restaurant_coordinates',
+    )
+    latitude = models.DecimalField(
+        max_digits=12,
+        decimal_places=6,
+        validators=[MinValueValidator(Decimal('0.01'))]
+    )
+    longitude = models.DecimalField(
+        max_digits=12,
+        decimal_places=6,
+        validators=[MinValueValidator(Decimal('0.01'))]
+    )
+
+
+@receiver(post_save, sender=Restaurant)
+def update_stock(sender, instance, **kwargs):
+    load_dotenv()
+    restaurant_coords = fetch_coordinates(
+        os.environ['GEOCODE_APIKEY'],
+        instance.address
+    )
+
+    RestaurantCoordinates.objects.create(
+        restaurant=instance,
+        longitude=restaurant_coords[0],
+        latitude=restaurant_coords[1]
+    )
 
 
 class ProductQuerySet(models.QuerySet):
@@ -197,6 +239,11 @@ class Order(models.Model):
         return f'Заказ номер {self.id} оформил(а) {self.firstname} {self.lastname}'
 
 
+class CertainTypeProductCostManager(models.Manager):
+    def get_product_type_cost(self):
+        return self.annotate(cost=F('product__price') * F('quantity'))
+
+
 class ProductInSomeOrder(models.Model):
     product = models.ForeignKey(
         Product,
@@ -211,6 +258,7 @@ class ProductInSomeOrder(models.Model):
         on_delete=models.CASCADE,
         related_name='products_in_some_order'
     )
+    product_type_cost = CertainTypeProductCostManager()
 
     class Meta:
         verbose_name = 'Элемент заказа'
@@ -218,3 +266,7 @@ class ProductInSomeOrder(models.Model):
 
     def __str__(self):
         return f'Продукт {self.product.name} относится к заказу под номером {self.order.id}'
+
+
+
+
