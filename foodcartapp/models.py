@@ -62,10 +62,12 @@ def update_stock(sender, instance, **kwargs):
         instance.address
     )
 
+    longitude, latitude = restaurant_coords
+
     RestaurantCoordinates.objects.create(
         restaurant=instance,
-        longitude=restaurant_coords[0],
-        latitude=restaurant_coords[1],
+        longitude=longitude,
+        latitude=latitude,
     )
 
 
