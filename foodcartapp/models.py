@@ -250,6 +250,7 @@ class ProductInSomeOrder(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
+        related_name='products_in_some_order',
         verbose_name='продукт',
     )
     quantity = models.PositiveIntegerField(
