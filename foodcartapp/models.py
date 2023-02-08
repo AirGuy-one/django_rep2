@@ -17,7 +17,7 @@ from restaurateur.fetch_coordinates import fetch_coordinates
 class Restaurant(models.Model):
     name = models.CharField(
         'название',
-        max_length=50
+        max_length=50,
     )
     address = models.CharField(
         'адрес',
@@ -31,8 +31,8 @@ class Restaurant(models.Model):
     )
 
     class Meta:
-        verbose_name = 'ресторан'
-        verbose_name_plural = 'рестораны'
+        verbose_name = 'Ресторан'
+        verbose_name_plural = 'Рестораны'
 
     def __str__(self):
         return self.name
@@ -47,12 +47,12 @@ class RestaurantCoordinates(models.Model):
     latitude = models.DecimalField(
         max_digits=12,
         decimal_places=6,
-        validators=[MinValueValidator(Decimal('0.01'))]
+        validators=[MinValueValidator(Decimal('0.01'))],
     )
     longitude = models.DecimalField(
         max_digits=12,
         decimal_places=6,
-        validators=[MinValueValidator(Decimal('0.01'))]
+        validators=[MinValueValidator(Decimal('0.01'))],
     )
 
 
@@ -67,7 +67,7 @@ def update_stock(sender, instance, **kwargs):
     RestaurantCoordinates.objects.create(
         restaurant=instance,
         longitude=restaurant_coords[0],
-        latitude=restaurant_coords[1]
+        latitude=restaurant_coords[1],
     )
 
 
@@ -84,12 +84,12 @@ class ProductQuerySet(models.QuerySet):
 class ProductCategory(models.Model):
     name = models.CharField(
         'название',
-        max_length=50
+        max_length=50,
     )
 
     class Meta:
-        verbose_name = 'категория'
-        verbose_name_plural = 'категории'
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
@@ -98,7 +98,7 @@ class ProductCategory(models.Model):
 class Product(models.Model):
     name = models.CharField(
         'название',
-        max_length=50
+        max_length=50,
     )
     category = models.ForeignKey(
         ProductCategory,
@@ -111,7 +111,7 @@ class Product(models.Model):
         'цена',
         max_digits=8,
         decimal_places=2,
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(0)],
     )
     image = models.ImageField(
         'картинка'
@@ -130,8 +130,8 @@ class Product(models.Model):
     objects = ProductQuerySet.as_manager()
 
     class Meta:
-        verbose_name = 'товар'
-        verbose_name_plural = 'товары'
+        verbose_name = 'Товар'
+        verbose_name_plural = 'Товары'
 
     def __str__(self):
         return self.name
@@ -157,8 +157,8 @@ class RestaurantMenuItem(models.Model):
     )
 
     class Meta:
-        verbose_name = 'пункт меню ресторана'
-        verbose_name_plural = 'пункты меню ресторана'
+        verbose_name = 'Пункт меню ресторана'
+        verbose_name_plural = 'Пункты меню ресторана'
         unique_together = [
             ['restaurant', 'product']
         ]
@@ -180,15 +180,15 @@ class Order(models.Model):
 
     address = models.CharField(
         'адрес',
-        max_length=255
+        max_length=255,
     )
     firstname = models.CharField(
         'имя',
-        max_length=255
+        max_length=255,
     )
     lastname = models.CharField(
         'фамилия',
-        max_length=255
+        max_length=255,
     )
     phonenumber = PhoneNumberField(
         'контактный телефон',
@@ -197,45 +197,45 @@ class Order(models.Model):
         'статус',
         max_length=11,
         choices=ORDER_STATUSES,
-        default='UNPROCESSED'
+        default='UNPROCESSED',
     )
     comment = models.TextField(
         'комментарий',
-        blank=True
+        blank=True,
     )
     registered_at = models.DateTimeField(
         'оформлен',
-        auto_now_add=True
+        auto_now_add=True,
     )
     called_at = models.DateTimeField(
         'осуществлен звонок',
         null=True,
-        blank=True
+        blank=True,
     )
     delivered_at = models.DateTimeField(
         'доставлен',
         null=True,
-        blank=True
+        blank=True,
     )
     payment_method = models.CharField(
         'способ оплаты',
         max_length=14,
         choices=PAYMENT_METHODS,
         null=True,
-        blank=True
+        blank=True,
     )
     restaurant = models.ForeignKey(
         Restaurant,
         on_delete=models.CASCADE,
         related_name='orders',
-        verbose_name='ресторан, готовящий заказ',
         null=True,
-        blank=True
+        blank=True,
+        verbose_name='ресторан, готовящий заказ',
     )
 
     class Meta:
-        verbose_name = 'заказ'
-        verbose_name_plural = 'заказы'
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
 
     def __str__(self):
         return f'Заказ номер {self.id} оформил(а) {self.firstname} {self.lastname}'
@@ -253,13 +253,14 @@ class ProductInSomeOrder(models.Model):
         verbose_name='продукт',
     )
     quantity = models.PositiveIntegerField(
-        verbose_name='кол-во продуктов',
         validators=[validate_quantity],
+        verbose_name='кол-во продуктов',
     )
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
         related_name='products_in_some_order',
+        verbose_name='заказ',
     )
     product_type_cost = CertainTypeProductCostManager()
     objects = models.Manager()
