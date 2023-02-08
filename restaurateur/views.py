@@ -12,11 +12,13 @@ from django.db import transaction
 from geopy import distance
 from dotenv import load_dotenv
 
-from foodcartapp.models import Product, ProductInSomeOrder, RestaurantMenuItem, RestaurantCoordinates
+from foodcartapp.models import Product, RestaurantMenuItem, RestaurantCoordinates
 from foodcartapp.models import Restaurant
 from foodcartapp.models import Order
 from foodcartapp.serializers import OrderSerializer
 from .fetch_coordinates import fetch_coordinates
+
+load_dotenv()
 
 
 class Login(forms.Form):
@@ -101,8 +103,6 @@ def view_restaurants(request):
 @transaction.atomic
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    load_dotenv()
-
     apikey = os.environ['GEOCODE_APIKEY']
 
     products_in_restaurants = {}

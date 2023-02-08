@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 from foodcartapp.validators import validate_quantity
 from restaurateur.fetch_coordinates import fetch_coordinates
 
+load_dotenv()
+
 
 class Restaurant(models.Model):
     name = models.CharField(
@@ -58,7 +60,6 @@ class RestaurantCoordinates(models.Model):
 
 @receiver(post_save, sender=Restaurant)
 def update_stock(sender, instance, **kwargs):
-    load_dotenv()
     restaurant_coords = fetch_coordinates(
         os.environ['GEOCODE_APIKEY'],
         instance.address
