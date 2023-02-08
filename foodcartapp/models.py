@@ -9,6 +9,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from phonenumber_field.modelfields import PhoneNumberField
 from dotenv import load_dotenv
+
+from foodcartapp.validators import validate_quantity
 from restaurateur.fetch_coordinates import fetch_coordinates
 
 
@@ -248,17 +250,19 @@ class ProductInSomeOrder(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        verbose_name='продукт'
+        verbose_name='продукт',
     )
     quantity = models.PositiveIntegerField(
-        verbose_name='кол-во продуктов'
+        verbose_name='кол-во продуктов',
+        validators=[validate_quantity],
     )
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
-        related_name='products_in_some_order'
+        related_name='products_in_some_order',
     )
     product_type_cost = CertainTypeProductCostManager()
+    objects = models.Manager()
 
     class Meta:
         verbose_name = 'Элемент заказа'
