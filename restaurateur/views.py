@@ -1,6 +1,7 @@
 import os
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Sum
 from django.shortcuts import redirect, render
 from django.views import View
@@ -145,6 +146,8 @@ def view_orders(request):
         serialized_orders[order_number]['restaurant'] = order.restaurant_cooking_order
 
         customer_coords = fetch_coordinates(apikey, order.address)
+        if customer_coords is None:
+            raise ValidationError('customer_coords have not found')
 
         restaurants_can_fulfill_order = []
 

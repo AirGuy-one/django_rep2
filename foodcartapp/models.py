@@ -1,5 +1,6 @@
 import os
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models import F
@@ -61,6 +62,8 @@ def update_stock(sender, instance, **kwargs):
         os.environ['GEOCODE_APIKEY'],
         instance.address
     )
+    if restaurant_coords is None:
+        raise ValidationError('restaurant_coords have not found')
 
     longitude, latitude = restaurant_coords
 
