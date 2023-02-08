@@ -10,15 +10,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from django.db import transaction
 from geopy import distance
-from dotenv import load_dotenv
 
 from foodcartapp.models import Product, RestaurantMenuItem, RestaurantCoordinates
 from foodcartapp.models import Restaurant
 from foodcartapp.models import Order
 from foodcartapp.serializers import OrderSerializer
 from .fetch_coordinates import fetch_coordinates
-
-load_dotenv()
 
 
 class Login(forms.Form):
@@ -104,6 +101,7 @@ def view_restaurants(request):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
     apikey = os.environ['GEOCODE_APIKEY']
+    print(apikey)
 
     products_in_restaurants = {}
 
@@ -126,15 +124,15 @@ def view_orders(request):
 
     for order in Order.objects.prefetch_related(
         Prefetch(
-            'products_in_some_order__product',
+            'order_products__product',
         ),
     ).all():
         list_products = []
 
-        for product in order.products_in_some_order.all():
+        for product in order.order_products.all():
             list_products.append(product.product)
 
-        cost = order.products_in_some_order.get_product_type_cost().aggregate(
+        cost = order.order_products.get_product_type_cost().aggregate(
             total_cost=Sum('cost')
         )['total_cost']
 

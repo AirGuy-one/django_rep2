@@ -30,6 +30,6 @@ class OrderSerializer(serializers.ModelSerializer):
             'called_at',
             'delivered_at',
             'payment_method',
-            'restaurant',
+            'restaurant_cooking_order',
             'products',
         ]

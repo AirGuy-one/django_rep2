@@ -8,12 +8,9 @@ from decimal import Decimal
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from phonenumber_field.modelfields import PhoneNumberField
-from dotenv import load_dotenv
 
 from foodcartapp.validators import validate_quantity
 from restaurateur.fetch_coordinates import fetch_coordinates
-
-load_dotenv()
 
 
 class Restaurant(models.Model):
