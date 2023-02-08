@@ -119,7 +119,7 @@ def view_orders(request):
         # products = [menu_item.product.product for menu_item in restaurant.menu_items.all()]
         products_in_restaurants[restaurant.name] = products
 
-    serialized_orders = OrderSerializer(Order.objects.all().select_related('restaurant'), many=True).data
+    serialized_orders = OrderSerializer(Order.objects.all().select_related('restaurant_cooking_order'), many=True).data
     order_number = 0
 
     restaurants_addresses = list(RestaurantCoordinates.objects.all())
@@ -144,7 +144,7 @@ def view_orders(request):
         serialized_orders[order_number]['cost'] = cost
         serialized_orders[order_number]['status'] = order.get_status_display()
         serialized_orders[order_number]['payment_method'] = order.get_payment_method_display()
-        serialized_orders[order_number]['restaurant'] = order.restaurant
+        serialized_orders[order_number]['restaurant'] = order.restaurant_cooking_order
 
         customer_coords = fetch_coordinates(apikey, order.address)
 
