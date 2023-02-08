@@ -17,6 +17,7 @@ from foodcartapp.models import Restaurant
 from foodcartapp.models import Order
 from foodcartapp.serializers import OrderSerializer
 from .fetch_coordinates import fetch_coordinates
+from star_burger.settings import apikey
 
 
 class Login(forms.Form):
@@ -101,9 +102,6 @@ def view_restaurants(request):
 @transaction.atomic
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    apikey = os.environ['GEOCODE_APIKEY']
-    print(apikey)
-
     products_in_restaurants = {}
 
     for restaurant in Restaurant.objects.prefetch_related(
@@ -115,7 +113,7 @@ def view_orders(request):
         products = []
         for menu_item in restaurant.menu_items.all():
             products.append(menu_item.product.product)
-        # products = [menu_item.product.product for menu_item in restaurant.menu_items.all()]
+
         products_in_restaurants[restaurant.name] = products
 
     serialized_orders = OrderSerializer(Order.objects.all().select_related('restaurant_cooking_order'), many=True).data

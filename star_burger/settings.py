@@ -4,9 +4,10 @@ import dj_database_url
 
 from environs import Env
 
-
 env = Env()
 env.read_env()
+
+apikey = env('GEOCODE_APIKEY')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
