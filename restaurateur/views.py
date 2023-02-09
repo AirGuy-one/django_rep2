@@ -1,8 +1,6 @@
-import os
-
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Prefetch, Sum
+from django.db.models import Prefetch, F
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
@@ -12,7 +10,7 @@ from django.contrib.auth import views as auth_views
 from django.db import transaction
 from geopy import distance
 
-from foodcartapp.models import Product, RestaurantMenuItem, RestaurantCoordinates
+from foodcartapp.models import Product, RestaurantCoordinates, ProductInSomeOrder
 from foodcartapp.models import Restaurant
 from foodcartapp.models import Order
 from foodcartapp.serializers import OrderSerializer
@@ -104,36 +102,34 @@ def view_restaurants(request):
 def view_orders(request):
     products_in_restaurants = {}
 
-    for restaurant in Restaurant.objects.prefetch_related(
-        Prefetch(
-            'menu_items__product',
-            queryset=RestaurantMenuItem.objects.all().only('product')
-        )
-    ).all().only('name'):
+    for restaurant in Restaurant.objects.prefetch_related('menu_items__product').all():
         products = []
         for menu_item in restaurant.menu_items.all():
-            products.append(menu_item.product.product)
+            products.append(menu_item.product)
 
         products_in_restaurants[restaurant.name] = products
 
     serialized_orders = OrderSerializer(Order.objects.all().select_related('restaurant_cooking_order'), many=True).data
+
     order_number = 0
 
     restaurants_addresses = list(RestaurantCoordinates.objects.all())
 
     for order in Order.objects.prefetch_related(
         Prefetch(
-            'order_products__product',
-        ),
+            'order_products',
+            queryset=ProductInSomeOrder.objects.select_related('product').annotate(
+                cost=F('product__price') * F('quantity')
+            )
+        )
     ).all():
+
         list_products = []
 
         for product in order.order_products.all():
             list_products.append(product.product)
 
-        cost = order.order_products.get_product_type_cost().aggregate(
-            total_cost=Sum('cost')
-        )['total_cost']
+        cost = sum(order_product.cost for order_product in order.order_products.all())
 
         if cost is None:
             cost = 0
