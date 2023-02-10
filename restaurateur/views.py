@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Prefetch, F
+from django.db.models import Prefetch, F, Sum
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
@@ -119,7 +119,7 @@ def view_orders(request):
         Prefetch(
             'order_products',
             queryset=ProductInSomeOrder.objects.select_related('product').annotate(
-                cost=F('product__price') * F('quantity')
+                cost=Sum(F('product__price') * F('quantity'))
             )
         )
     ).all():
@@ -129,7 +129,7 @@ def view_orders(request):
         for product in order.order_products.all():
             list_products.append(product.product)
 
-        cost = sum(order_product.cost for order_product in order.order_products.all())
+        cost = order.order_products.all()[0].cost
 
         if cost is None:
             cost = 0
