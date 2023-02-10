@@ -109,7 +109,7 @@ def view_orders(request):
 
         products_in_restaurants[restaurant.name] = products
 
-    serialized_orders = OrderSerializer(Order.objects.all().select_related('restaurant_cooking_order'), many=True).data
+    serialized_orders = OrderSerializer(Order.objects.all().select_related('restaurant_cooking'), many=True).data
 
     order_number = 0
 
@@ -137,7 +137,7 @@ def view_orders(request):
         serialized_orders[order_number]['cost'] = cost
         serialized_orders[order_number]['status'] = order.get_status_display()
         serialized_orders[order_number]['payment_method'] = order.get_payment_method_display()
-        serialized_orders[order_number]['restaurant'] = order.restaurant_cooking_order
+        serialized_orders[order_number]['restaurant'] = order.restaurant_cooking
 
         customer_coords = fetch_coordinates(GEOCODE_API_KEY, order.address)
         if customer_coords is None:

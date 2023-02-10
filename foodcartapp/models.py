@@ -227,7 +227,7 @@ class Order(models.Model):
         null=True,
         blank=True,
     )
-    restaurant_cooking_order = models.ForeignKey(
+    restaurant_cooking = models.ForeignKey(
         Restaurant,
         on_delete=models.CASCADE,
         related_name='orders',
