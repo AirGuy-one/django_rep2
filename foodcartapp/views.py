@@ -80,7 +80,8 @@ def register_order(request):
             ProductInSomeOrder(
                 product=product['product'],
                 quantity=product['quantity'],
-                order=current_order
+                order=current_order,
+                price=product['product'].price,
             )
         )
 

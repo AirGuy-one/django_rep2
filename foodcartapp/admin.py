@@ -1,9 +1,15 @@
+import os
+
 from django.contrib import admin
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.shortcuts import reverse
 from django.templatetags.static import static
 from django.utils.html import format_html
 from django.http import HttpResponseRedirect
+from django.core.exceptions import ValidationError
 
+from restaurateur.fetch_coordinates import fetch_coordinates
 from .models import Product, RestaurantCoordinates
 from .models import ProductCategory
 from .models import Restaurant
@@ -32,6 +38,23 @@ class RestaurantAdmin(admin.ModelAdmin):
     inlines = [
         RestaurantMenuItemInline
     ]
+
+    @receiver(post_save, sender=Restaurant)
+    def update_stock(sender, instance, **kwargs):
+        restaurant_coords = fetch_coordinates(
+            os.environ['GEOCODE_APIKEY'],
+            instance.address
+        )
+        if restaurant_coords is None:
+            raise ValidationError('restaurant_coords have not found')
+
+        longitude, latitude = restaurant_coords
+
+        RestaurantCoordinates.objects.create(
+            restaurant=instance,
+            longitude=longitude,
+            latitude=latitude,
+        )
 
 
 @admin.register(Product)

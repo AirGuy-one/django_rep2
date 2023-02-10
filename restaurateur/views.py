@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from django.db import transaction
+from django.conf import settings
 from geopy import distance
 
 from foodcartapp.models import Product, RestaurantCoordinates, ProductInSomeOrder
@@ -15,7 +16,6 @@ from foodcartapp.models import Restaurant
 from foodcartapp.models import Order
 from foodcartapp.serializers import OrderSerializer
 from .fetch_coordinates import fetch_coordinates
-from star_burger.settings import GEOCODE_API_KEY
 
 
 class Login(forms.Form):
@@ -119,7 +119,7 @@ def view_orders(request):
         Prefetch(
             'order_products',
             queryset=ProductInSomeOrder.objects.select_related('product').annotate(
-                cost=Sum(F('product__price') * F('quantity'))
+                cost=F('price') * F('quantity')
             )
         )
     ).all():
@@ -129,7 +129,7 @@ def view_orders(request):
         for product in order.order_products.all():
             list_products.append(product.product)
 
-        cost = order.order_products.all()[0].cost
+        cost = sum(p.cost for p in order.order_products.all())
 
         if cost is None:
             cost = 0
@@ -139,7 +139,7 @@ def view_orders(request):
         serialized_orders[order_number]['payment_method'] = order.get_payment_method_display()
         serialized_orders[order_number]['restaurant'] = order.restaurant_cooking
 
-        customer_coords = fetch_coordinates(GEOCODE_API_KEY, order.address)
+        customer_coords = fetch_coordinates(settings.GEOCODE_API_KEY, order.address)
         if customer_coords is None:
             raise ValidationError('customer_coords have not found')
 

@@ -1,17 +1,11 @@
-import os
-
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models import F
 from decimal import Decimal
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from phonenumber_field.modelfields import PhoneNumberField
 
 from foodcartapp.validators import validate_quantity
-from restaurateur.fetch_coordinates import fetch_coordinates
 
 
 class Restaurant(models.Model):
@@ -53,24 +47,6 @@ class RestaurantCoordinates(models.Model):
         max_digits=12,
         decimal_places=6,
         validators=[MinValueValidator(Decimal('0.01'))],
-    )
-
-
-@receiver(post_save, sender=Restaurant)
-def update_stock(sender, instance, **kwargs):
-    restaurant_coords = fetch_coordinates(
-        os.environ['GEOCODE_APIKEY'],
-        instance.address
-    )
-    if restaurant_coords is None:
-        raise ValidationError('restaurant_coords have not found')
-
-    longitude, latitude = restaurant_coords
-
-    RestaurantCoordinates.objects.create(
-        restaurant=instance,
-        longitude=longitude,
-        latitude=latitude,
     )
 
 
@@ -266,7 +242,12 @@ class ProductInSomeOrder(models.Model):
         related_name='order_products',
         verbose_name='заказ',
     )
-    product_type_cost = CertainTypeProductCostManager()
+    price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        verbose_name='цена продукта',
+    )
     objects = models.Manager()
 
     class Meta:
