@@ -15,7 +15,7 @@ from foodcartapp.models import Restaurant
 from foodcartapp.models import Order
 from foodcartapp.serializers import OrderSerializer
 from .fetch_coordinates import fetch_coordinates
-from star_burger.settings import apikey
+from star_burger.settings import GEOCODE_API_KEY
 
 
 class Login(forms.Form):
@@ -139,7 +139,7 @@ def view_orders(request):
         serialized_orders[order_number]['payment_method'] = order.get_payment_method_display()
         serialized_orders[order_number]['restaurant'] = order.restaurant_cooking_order
 
-        customer_coords = fetch_coordinates(apikey, order.address)
+        customer_coords = fetch_coordinates(GEOCODE_API_KEY, order.address)
         if customer_coords is None:
             raise ValidationError('customer_coords have not found')
 
