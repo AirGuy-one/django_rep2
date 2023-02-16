@@ -59,6 +59,11 @@ pip install -r requirements.txt
 SECRET_KEY=django-insecure-0if40nf4nf93n4
 ```
 
+Определите переменную окружения `GEOCODE_APIKEY`. Создать файл `.env` в каталоге `foodcartapp/` и положите туда такой код:
+```sh
+GEOCODE_APIKEY=thisisgooglekeywegjiewrjgijewrgo
+```
+
 Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
 
 ```sh
