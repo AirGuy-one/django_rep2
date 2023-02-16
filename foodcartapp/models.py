@@ -220,11 +220,6 @@ class Order(models.Model):
         return f'Заказ номер {self.id} оформил(а) {self.firstname} {self.lastname}'
 
 
-class CertainTypeProductCostManager(models.Manager):
-    def get_product_type_cost(self):
-        return self.annotate(cost=F('product__price') * F('quantity'))
-
-
 class ProductInSomeOrder(models.Model):
     product = models.ForeignKey(
         Product,
