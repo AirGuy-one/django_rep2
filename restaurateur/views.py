@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, F, Sum
@@ -111,18 +113,17 @@ def view_orders(request):
 
     serialized_orders = OrderSerializer(Order.objects.all().select_related('restaurant_cooking'), many=True).data
 
-    order_number = 0
-
     restaurants_addresses = list(RestaurantCoordinates.objects.all())
 
-    for order in Order.objects.prefetch_related(
+    for order_number, order in enumerate(Order.objects.prefetch_related(
         Prefetch(
             'order_products',
             queryset=ProductInSomeOrder.objects.select_related('product').annotate(
                 cost=F('price') * F('quantity')
             )
         )
-    ).all():
+    ).all()
+                           ):
 
         list_products = []
 
@@ -165,8 +166,6 @@ def view_orders(request):
             restaurant_address_index += 1
 
         serialized_orders[order_number]['restaurants_can_fulfill_order'] = restaurants_can_fulfill_order
-
-        order_number += 1
 
     return render(request, template_name='order_items.html', context={
         'orders': serialized_orders,
