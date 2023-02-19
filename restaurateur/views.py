@@ -115,22 +115,14 @@ def view_orders(request):
 
     restaurants_addresses = list(RestaurantCoordinates.objects.all())
 
-    for order_number, order in enumerate(Order.objects.prefetch_related(
-        Prefetch(
-            'order_products',
-            queryset=ProductInSomeOrder.objects.select_related('product').annotate(
-                cost=F('price') * F('quantity')
-            )
-        )
-    ).all()
-                           ):
+    for order_number, order in enumerate(Order.objects.all()):
 
         list_products = []
 
         for product in order.order_products.all():
             list_products.append(product.product)
 
-        cost = sum(p.cost for p in order.order_products.all())
+        cost = sum(p.cost for p in order.order_products.annotate(cost=F('price')))
 
         if cost is None:
             cost = 0
