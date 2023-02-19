@@ -135,10 +135,14 @@ def view_orders(request):
         if cost is None:
             cost = 0
 
-        serialized_orders[order_number]['cost'] = cost
-        serialized_orders[order_number]['status'] = order.get_status_display()
-        serialized_orders[order_number]['payment_method'] = order.get_payment_method_display()
-        serialized_orders[order_number]['restaurant'] = order.restaurant_cooking
+        serialized_orders[order_number].update(
+            {
+                'cost': cost,
+                'status': order.get_status_display(),
+                'payment_method': order.get_payment_method_display(),
+                'restaurant': order.restaurant_cooking
+            }
+        )
 
         customer_coords = fetch_coordinates(settings.GEOCODE_API_KEY, order.address)
         if customer_coords is None:
