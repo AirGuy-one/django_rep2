@@ -105,9 +105,7 @@ def view_orders(request):
     products_in_restaurants = {}
 
     for restaurant in Restaurant.objects.prefetch_related('menu_items__product').all():
-        products = []
-        for menu_item in restaurant.menu_items.all():
-            products.append(menu_item.product)
+        products = [menu_item.product for menu_item in restaurant.menu_items.all()]
 
         products_in_restaurants[restaurant.name] = products
 
