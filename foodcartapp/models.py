@@ -36,16 +36,19 @@ class RestaurantCoordinates(models.Model):
         Restaurant,
         on_delete=models.CASCADE,
         related_name='restaurant_coordinates',
+        verbose_name='ресторант',
     )
     latitude = models.DecimalField(
         max_digits=12,
         decimal_places=6,
         validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='широта',
     )
     longitude = models.DecimalField(
         max_digits=12,
         decimal_places=6,
         validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='долгота',
     )
 
 
