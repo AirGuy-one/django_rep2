@@ -113,7 +113,7 @@ def view_orders(request):
 
     restaurants_addresses = list(RestaurantCoordinates.objects.all())
 
-    for order_number, order in enumerate(Order.objects.all()):
+    for order_number, order in enumerate(Order.objects.filter(status='UNPROCESSED')):
 
         list_products = []
 
@@ -140,9 +140,8 @@ def view_orders(request):
 
         restaurants_can_fulfill_order = []
 
-        restaurant_address_index = 0
-
-        for name_of_restaurant, products_in_restaurant in products_in_restaurants.items():
+        for restaurant_address_index, name_of_restaurant in enumerate(products_in_restaurants):
+            products_in_restaurant = products_in_restaurants[name_of_restaurant]
             if set(list_products).issubset(products_in_restaurant):
                 restaurant_coords = (
                     restaurants_addresses[restaurant_address_index].latitude,
@@ -156,8 +155,6 @@ def view_orders(request):
                 }
 
                 restaurants_can_fulfill_order.append(restaurant_distance_pair)
-
-            restaurant_address_index += 1
 
         serialized_orders[order_number]['restaurants_can_fulfill_order'] = restaurants_can_fulfill_order
 
