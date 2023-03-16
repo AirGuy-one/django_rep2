@@ -39,22 +39,22 @@ class RestaurantAdmin(admin.ModelAdmin):
         RestaurantMenuItemInline
     ]
 
-    @receiver(post_save, sender=Restaurant)
-    def update_stock(sender, instance, **kwargs):
+    def save_model(self, request, obj, form, change):
         restaurant_coords = fetch_coordinates(
             os.environ['GEOCODE_APIKEY'],
-            instance.address
+            obj.address
         )
         if restaurant_coords is None:
             raise ValidationError('restaurant_coords have not found')
-
         longitude, latitude = restaurant_coords
-
+        obj.save()
         RestaurantCoordinates.objects.create(
-            restaurant=instance,
+            restaurant=obj,
             longitude=longitude,
             latitude=latitude,
         )
+
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Product)
