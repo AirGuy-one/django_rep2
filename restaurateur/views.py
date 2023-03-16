@@ -113,21 +113,20 @@ def view_orders(request):
 
     restaurants_addresses = list(RestaurantCoordinates.objects.all())
 
-    for order_number, order in enumerate(Order.objects.filter(status='UNPROCESSED')):
+    for order_number, order in enumerate(Order.objects.filter(status='UNPROCESSED').prefetch_related(
+        Prefetch(
+            'order_products__product',
+        ),
+    ).annotate(cost=Sum(F('order_products__price')))):
 
         list_products = []
 
         for product in order.order_products.all():
             list_products.append(product.product)
 
-        cost = sum(p.cost for p in order.order_products.annotate(cost=F('price')))
-
-        if cost is None:
-            cost = 0
-
         serialized_orders[order_number].update(
             {
-                'cost': cost,
+                'cost': order.cost if order.cost is not None else 0,
                 'status': order.get_status_display(),
                 'payment_method': order.get_payment_method_display(),
                 'restaurant': order.restaurant_cooking
