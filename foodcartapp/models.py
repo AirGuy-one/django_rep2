@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 
 from phonenumber_field.modelfields import PhoneNumberField
@@ -41,13 +41,13 @@ class RestaurantCoordinates(models.Model):
     latitude = models.DecimalField(
         max_digits=12,
         decimal_places=6,
-        validators=[MinValueValidator(Decimal('0.01'))],
+        validators=[MinValueValidator(Decimal('-90.0')), MaxValueValidator(Decimal('90.0'))],
         verbose_name='широта',
     )
     longitude = models.DecimalField(
         max_digits=12,
         decimal_places=6,
-        validators=[MinValueValidator(Decimal('0.01'))],
+        validators=[MinValueValidator(Decimal('-180.0')), MaxValueValidator(Decimal('180.0'))],
         verbose_name='долгота',
     )
 
