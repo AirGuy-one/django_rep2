@@ -57,9 +57,10 @@ pip install -r requirements.txt
 Определите переменную окружения `SECRET_KEY`. Создать файл `.env` в каталоге `star_burger/` и положите туда такой код:
 ```sh
 SECRET_KEY=django-insecure-0if40nf4nf93n4
+GEOCODE_APIKEY=thisisgooglekeywegjiewrjgijewrgo
 ```
 
-Определите переменную окружения `GEOCODE_APIKEY`. Создать файл `.env` в каталоге `foodcartapp/` и положите туда такой код:
+Определите переменную окружения `GEOCODE_APIKEY`. Создать файлы `.env` в каталогах `foodcartapp/` и `restaurateur/` и положите туда такой код:
 ```sh
 GEOCODE_APIKEY=thisisgooglekeywegjiewrjgijewrgo
 ```
