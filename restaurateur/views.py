@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, F, Sum
@@ -13,7 +11,7 @@ from django.db import transaction
 from django.conf import settings
 from geopy import distance
 
-from foodcartapp.models import Product, RestaurantCoordinates, ProductInSomeOrder
+from foodcartapp.models import Product
 from foodcartapp.models import Restaurant
 from foodcartapp.models import Order
 from foodcartapp.serializers import OrderSerializer
@@ -107,11 +105,9 @@ def view_orders(request):
     for restaurant in Restaurant.objects.prefetch_related('menu_items__product').all():
         products = [menu_item.product for menu_item in restaurant.menu_items.all()]
 
-        products_in_restaurants[restaurant.name] = products
+        products_in_restaurants[restaurant] = products
 
     serialized_orders = OrderSerializer(Order.objects.all().select_related('restaurant_cooking'), many=True).data
-
-    restaurants_addresses = list(RestaurantCoordinates.objects.all())
 
     for order_number, order in enumerate(Order.objects.filter(status='UNPROCESSED').prefetch_related(
         Prefetch(
@@ -139,16 +135,16 @@ def view_orders(request):
 
         restaurants_can_fulfill_order = []
 
-        for restaurant_address_index, name_of_restaurant in enumerate(products_in_restaurants):
-            products_in_restaurant = products_in_restaurants[name_of_restaurant]
+        for restaurant_address_index, restaurant in enumerate(products_in_restaurants):
+            products_in_restaurant = products_in_restaurants[restaurant]
             if set(list_products).issubset(products_in_restaurant):
                 restaurant_coords = (
-                    restaurants_addresses[restaurant_address_index].latitude,
-                    restaurants_addresses[restaurant_address_index].longitude
+                    restaurant.latitude,
+                    restaurant.longitude
                 )
 
                 restaurant_distance_pair = {
-                    'restaurant': name_of_restaurant,
+                    'restaurant': restaurant.name,
                     'distance': str(distance.distance(restaurant_coords,
                                                       customer_coords).miles)[:-10]
                 }

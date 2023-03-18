@@ -22,22 +22,6 @@ class Restaurant(models.Model):
         max_length=50,
         blank=True,
     )
-
-    class Meta:
-        verbose_name = 'Ресторан'
-        verbose_name_plural = 'Рестораны'
-
-    def __str__(self):
-        return self.name
-
-
-class RestaurantCoordinates(models.Model):
-    restaurant = models.OneToOneField(
-        Restaurant,
-        on_delete=models.CASCADE,
-        related_name='restaurant_coordinates',
-        verbose_name='ресторант',
-    )
     latitude = models.DecimalField(
         max_digits=12,
         decimal_places=6,
@@ -50,6 +34,13 @@ class RestaurantCoordinates(models.Model):
         validators=[MinValueValidator(Decimal('-180.0')), MaxValueValidator(Decimal('180.0'))],
         verbose_name='долгота',
     )
+
+    class Meta:
+        verbose_name = 'Ресторан'
+        verbose_name_plural = 'Рестораны'
+
+    def __str__(self):
+        return self.name
 
 
 class ProductQuerySet(models.QuerySet):
