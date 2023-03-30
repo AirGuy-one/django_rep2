@@ -221,7 +221,7 @@ class ProductInSomeOrder(models.Model):
         verbose_name='продукт',
     )
     quantity = models.PositiveIntegerField(
-        validators=[validate_quantity],
+        validators=[MinValueValidator(1)],
         verbose_name='кол-во продуктов',
     )
     order = models.ForeignKey(
