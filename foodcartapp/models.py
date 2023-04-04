@@ -4,8 +4,6 @@ from decimal import Decimal
 
 from phonenumber_field.modelfields import PhoneNumberField
 
-from foodcartapp.validators import validate_quantity
-
 
 class Restaurant(models.Model):
     name = models.CharField(
