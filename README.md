@@ -58,6 +58,7 @@ pip install -r requirements.txt
 ```sh
 SECRET_KEY=django-insecure-0if40nf4nf93n4
 GEOCODE_APIKEY=thisisgooglekeywegjiewrjgijewrgo
+ROLLBAR_ACCESS_TOKEN=thisisrollbaraccesstoken
 ```
 
 Определите переменную окружения `GEOCODE_APIKEY`. Создать файлы `.env` в каталогах `foodcartapp/` и `restaurateur/` и положите туда такой код:

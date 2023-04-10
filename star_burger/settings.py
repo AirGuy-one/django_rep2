@@ -1,6 +1,6 @@
 import os
-
 import dj_database_url
+import rollbar
 
 from environs import Env
 
@@ -42,7 +42,30 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
+
+ROLLBAR = {
+    'access_token': env('ROLLBAR_ACCESS_TOKEN'),
+    'environment': 'development' if DEBUG else 'production',
+    'code_version': '1.0',
+    'root': BASE_DIR,
+}
+
+# Specify maximum number of times an error can occur before it is no longer reported to Rollbar
+rollbar.init(
+    access_token=env('ROLLBAR_ACCESS_TOKEN'),
+    allow_logging_basic_config=False,
+    integrations={
+        'django': {
+            'enabled': True,
+            'environment': 'production'
+        }
+    },
+    maximum_occurrences=1,
+    occurrences_min_delay=3600,
+)
 
 ROOT_URLCONF = 'star_burger.urls'
 
