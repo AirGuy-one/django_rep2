@@ -46,26 +46,27 @@ MIDDLEWARE = [
     'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
 
-ROLLBAR = {
-    'access_token': env('ROLLBAR_ACCESS_TOKEN'),
-    'environment': 'development' if DEBUG else 'production',
-    'code_version': '1.0',
-    'root': BASE_DIR,
-}
-
 # Specify maximum number of times an error can occur before it is no longer reported to Rollbar
-rollbar.init(
-    access_token=env('ROLLBAR_ACCESS_TOKEN'),
-    allow_logging_basic_config=False,
-    integrations={
-        'django': {
-            'enabled': True,
-            'environment': 'production'
-        }
-    },
-    maximum_occurrences=1,
-    occurrences_min_delay=3600,
-)
+if not DEBUG:
+    ROLLBAR = {
+        'access_token': env('ROLLBAR_ACCESS_TOKEN'),
+        'environment': 'development' if DEBUG else 'production',
+        'code_version': '1.0',
+        'root': BASE_DIR,
+    }
+
+    rollbar.init(
+        access_token=env('ROLLBAR_ACCESS_TOKEN'),
+        allow_logging_basic_config=False,
+        integrations={
+            'django': {
+                'enabled': True,
+                'environment': 'production'
+            }
+        },
+        maximum_occurrences=1,
+        occurrences_min_delay=3600,
+    )
 
 ROOT_URLCONF = 'star_burger.urls'
 
@@ -108,14 +109,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DATABASE_NAME'),
-        'USER': os.environ.get('DATABASE_USER'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-        'HOST': os.environ.get('DATABASE_HOST'),
-        'PORT': os.environ.get('DATABASE_PORT'),
-    }
+    'default': dj_database_url.config(
+        default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
