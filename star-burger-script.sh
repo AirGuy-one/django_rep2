@@ -12,7 +12,7 @@ python3 manage.py migrate
 python3 manage.py collectstatic --no-input
 systemctl reload star-burger
 
-access_token="71fcf0f288e641d9ba832a19d635b2b5"
+access_token="${ACCESS_TOKEN}"
 revision="git SHA"
 local_username="root server user"
 comment="deploy was successfully"
