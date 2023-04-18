@@ -15,7 +15,6 @@ systemctl reload star-burger
 access_token="${ACCESS_TOKEN}"
 revision=$(git rev-parse HEAD)
 local_username="root server user"
-comment="deploy was successfully"
 
 curl -X POST \
      -H "X-Rollbar-Access-Token: $access_token" \
@@ -24,3 +23,5 @@ curl -X POST \
      https://api.rollbar.com/api/1/deploy
 
 echo -e "\nThe script has been successfully completed!"
+
+comment="deploy was successfully"
