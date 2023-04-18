@@ -159,8 +159,14 @@ Parcel будет следить за файлами в каталоге `bundle
    - `DEBUG` — дебаг-режим. Поставьте `False`.
    - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте.
    - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
+   - `ROLLBAR_ACCESS_TOKEN` - токен rollbar
+   - `DATABASE_URL` url базы данных
 2) создать файл `.env` в каталоге `foodcartapp/` со следующими настройками:
    - `GEOCODE_APIKEY` - секретный ключ от api с геоданными
+3) создать переменную виртуального окружения:
+```sh
+export ACCESS_TOKEN="here_is_rollbar_access_token"
+```
 
 ## Цели проекта
 
