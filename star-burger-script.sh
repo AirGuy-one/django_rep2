@@ -6,11 +6,10 @@ set -e -o pipefail
 cd /opt/django_rep2/
 source venv/bin/activate
 git pull
-#pip install -r requirements.txt
-#npm ci --dev
-python3 manage.py makemigrations
+pip install -r requirements.txt
+npm ci --dev
 python3 manage.py migrate
-echo "yes" | python3 manage.py collectstatic
+python3 manage.py collectstatic --no-input
 systemctl reload star-burger
 
 access_token="71fcf0f288e641d9ba832a19d635b2b5"
