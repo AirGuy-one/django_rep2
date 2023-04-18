@@ -13,7 +13,7 @@ python3 manage.py collectstatic --no-input
 systemctl reload star-burger
 
 access_token="${ACCESS_TOKEN}"
-revision="git SHA"
+revision=$(git rev-parse HEAD)
 local_username="root server user"
 comment="deploy was successfully"
 
