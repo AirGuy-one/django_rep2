@@ -47,7 +47,7 @@ MIDDLEWARE = [
 ]
 
 # Specify maximum number of times an error can occur before it is no longer reported to Rollbar
-if not DEBUG:
+if not env('ROLLBAR_ENABLED', False):
     ROLLBAR = {
         'access_token': env('ROLLBAR_ACCESS_TOKEN'),
         'environment': env('ROLLBAR_ENVIRONMENT', 'development'),
