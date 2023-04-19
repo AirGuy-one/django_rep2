@@ -8,7 +8,7 @@ source venv/bin/activate
 git pull
 pip install -r requirements.txt
 npm ci --dev
-python3 manage.py migrate
+python3 manage.py migrate --no-input
 python3 manage.py collectstatic --no-input
 systemctl reload star-burger
 
