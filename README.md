@@ -148,25 +148,152 @@ Parcel будет следить за файлами в каталоге `bundle
 
 ## Как запустить prod-версию сайта
 
-Собрать фронтенд:
+Для запуска сайта нужно запустить **одновременно** бэкенд и фронтенд, в двух терминалах.
 
+### Как собрать бэкенд
+
+Скачайте код:
 ```sh
-./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
+git clone https://github.com/devmanorg/star-burger.git
 ```
 
-Настроить бэкенд:
-1) создать файл `.env` в каталоге `star_burger/` со следующими настройками:
-   - `DEBUG` — дебаг-режим. Поставьте `False`.
-   - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте.
-   - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
-   - `ROLLBAR_ACCESS_TOKEN` - токен rollbar
-   - `DATABASE_URL` url базы данных
-   - `ROLLBAR_ENVIRONMENT` состояние rollbar: development или production
-2) создать файл `.env` в каталоге `foodcartapp/` со следующими настройками:
-   - `GEOCODE_APIKEY` - секретный ключ от api с геоданными
-3) создать переменную виртуального окружения:
+Перейдите в каталог проекта:
 ```sh
-export ACCESS_TOKEN="here_is_rollbar_access_token"
+cd star-burger
+```
+
+[Установите Python](https://www.python.org/), если этого ещё не сделали.
+
+Проверьте, что `python` установлен и корректно настроен. Запустите его в командной строке:
+```sh
+python --version
+```
+**Важно!** Версия Python должна быть не ниже 3.6.
+
+Возможно, вместо команды `python` здесь и в остальных инструкциях этого README придётся использовать `python3`. Зависит это от операционной системы и от того, установлен ли у вас Python старой второй версии.
+
+В каталоге проекта создайте виртуальное окружение:
+```sh
+python -m venv venv
+```
+Активируйте его. На разных операционных системах это делается разными командами:
+
+- Windows: `.\venv\Scripts\activate`
+- MacOS/Linux: `source venv/bin/activate`
+
+
+Установите зависимости в виртуальное окружение:
+```sh
+pip install -r requirements.txt
+```
+
+Определите переменную окружения `SECRET_KEY`. Создать файл `.env` в каталоге `star_burger/` и положите туда такой код:
+```
+GEOCODE_APIKEY=thisisgeocodeapikey
+SECRET_KEY=thisisdjangosecretkey
+ALLOWED_HOSTS=thisisallowhost
+DEBUG=True
+ROLLBAR_ACCESS_TOKEN=thisisrollbaraccesstoken
+ROLLBAR_ENABLED=True
+DATABASE_URL=thisisdatabaseurl
+```
+
+Определите переменную окружения `GEOCODE_APIKEY`. Создать файлы `.env` в каталогах `foodcartapp/` и `restaurateur/` и положите туда такой код:
+```
+GEOCODE_APIKEY=thisisgooglekeywegjiewrjgijewrgo
+```
+
+Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
+
+```sh
+python manage.py migrate
+```
+
+Создать daemon который будет держать сайт включенным всегда:
+
+- создание service файла
+```shell
+nano /etc/systemd/system/star-burger.service
+```
+
+- наполнение service файла
+```
+[Unit]
+Description=This is Django website burger restaurant
+After=network.target
+
+Requires=postgresql.service
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/path/to/project/folder/
+Environment="DJ_DEBUG=False"
+Environment="DJ_ALLOWED_HOSTS=<your host>"
+ExecStart=/path/to/project/folder/venv/bin/gunicorn -b 127.0.0.1:8080 --workers 3 star_burger.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Установите и запустите nginx:
+```shell
+sudo apt-get update
+sudo apt-get install nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+```
+
+Создать nginx файл:
+
+- создание файла
+```shell
+nano /etc/nginx/sites-enabled/django-rep-2.conf
+```
+
+- наполнение файла
+```
+server {
+  listen your domain:80;
+
+  location / {
+    include '/etc/nginx/proxy_params';
+    proxy_pass http://127.0.0.1:8080/;
+  }
+
+  location /static/ {
+    alias '/path/to/static/files/';
+  }
+
+  location /media/ {
+    alias '/path/to/media/files/';
+  }
+}
+```
+
+Запустите сервер:
+
+```sh
+systemctl reload nginx
+systemctl start star-burger
+```
+
+Откройте сайт в браузере по адресу [http://your_domain:80/](http://your_domain:80/). Если вы увидели пустую белую страницу, то не пугайтесь, выдохните. Просто фронтенд пока ещё не собран. Переходите к следующему разделу README.
+
+### Собрать фронтенд
+
+Фронтенд собирается также, как и в dev-версии сайта
+
+### Чтобы обновить код на сервере, запустите этот скрипт:
+
+```sh
+./star-burger-script
 ```
 
 ## Цели проекта
