@@ -1,13 +1,11 @@
-FROM python:3.9-alpine3.18
+FROM python:3.9-alpine
 
-RUN apk add postgresql-client
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt /code/requirements.txt
-COPY . /code/
+WORKDIR /app
 
-WORKDIR /code
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r /app/requirements.txt --no-cache-dir
 
-EXPOSE 8000
-
-RUN pip install --upgrade pip
-RUN pip install -r /code/requirements.txt
+COPY . .
