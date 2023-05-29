@@ -7,8 +7,6 @@ from environs import Env
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
-
 env = Env()
 env.read_env()
 
@@ -124,11 +122,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
+            'NAME': env.str('DATABASE_USER'),
+            'USER': env.str('DATABASE_USER'),
+            'PASSWORD': env.str('DATABASE_PASSWORD'),
+            'HOST': env.str('DATABASE_HOST'),
+            'PORT': env.int('DATABASE_PORT'),
         }
     }
 
