@@ -8,26 +8,28 @@ services:
     restart: always
     volumes:
       - media_value:/app/media/
-      - static_value:/app/static/
+      - static_value:/app/staticfiles/
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate &&
+             gunicorn star_burger.wsgi:application --bind 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
     env_file:
       - ../star_burger/.env
     depends_on:
       - db
-    command: >
-      sh -c "python manage.py collectstatic --noinput &&
-             python manage.py migrate &&
-             gunicorn star_burger.wsgi:application --bind 0.0.0.0:8080"
-    ports:
-      - "8080:8080"
 
   db:
     image: postgres:13.0-alpine
     volumes:
-      - db_value:/var/lib/postgresql/data
-    env_file:
-      - ../star_burger/.env
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=hello_django
+      - POSTGRES_PASSWORD=hello_django
+      - POSTGRES_DB=hello_django_dev
     ports:
-      - "5433:5432"
+      - "5432:5432"
 
   nginx:
     image: nginx:1.19.3
@@ -43,4 +45,4 @@ services:
 volumes:
   static_value:
   media_value:
-  db_value:
+  postgres_data:
