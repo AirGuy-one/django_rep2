@@ -42,6 +42,14 @@ services:
     depends_on:
       - backend
 
+  frontend:
+    build:
+      context: ../frontend/
+      dockerfile: Dockerfile
+    container_name: django_rep2-frontend
+    ports:
+      - "3000:3000"
+
 volumes:
   static_value:
   media_value:
