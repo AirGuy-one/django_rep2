@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: star-burger-deployment
+  labels:
+    app: star-burger
+spec:
+  selector:
+    matchLabels:
+      app: star-burger
+  template:
+    metadata:
+      labels:
+        app: star-burger
+    spec:
+      containers:
+        - name: star-burger-container
+          image: star-burger-image:fullstack
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: star-burger-configmap
+          ports:
+            - containerPort: 8000
+              name: gunicorn
