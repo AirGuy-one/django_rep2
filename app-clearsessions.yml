@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: django-clearsessions
+spec:
+  schedule: "0 0 1 */1 *" #	Run every month
+  startingDeadlineSeconds: 50
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 60
+      backoffLimit: 3
+      template:
+        spec:
+          containers:
+            - name: star-burger-container
+              image: star-burger-image:fullstack
+              imagePullPolicy: IfNotPresent
+              command: ["python", "manage.py", "clearsessions"]
+          restartPolicy: Never
