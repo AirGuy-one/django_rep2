@@ -5,7 +5,7 @@ metadata:
 data:
   GEOCODE_APIKEY: "a211ff4a-bb2b-4840-a91b-993454b15f39"
   SECRET_KEY: "django-insecure-0if40nf4nf93n4"
-  ALLOWED_HOSTS: "127.0.0.1,0.0.0.0,192.168.59.100"
+  ALLOWED_HOSTS: "127.0.0.1,0.0.0.0,192.168.59.100,star-burger.test"
   DEBUG: "True"
   ROLLBAR_ACCESS_TOKEN: "71fcf0f288e641d9ba832a19d635b2b5"
   ROLLBAR_ENABLED: "True"
