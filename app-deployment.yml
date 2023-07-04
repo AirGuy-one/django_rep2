@@ -23,3 +23,19 @@ spec:
           ports:
             - containerPort: 8000
               name: gunicorn
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-migrate
+spec:
+  ttlSecondsAfterFinished: 50
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - name: star-burger-container
+        image: star-burger-image:fullstack
+        imagePullPolicy: IfNotPresent
+        command: ["python", "manage.py", "migrate", "--no-input"]
+      restartPolicy: Never
