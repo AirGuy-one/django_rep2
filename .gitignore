@@ -143,13 +143,11 @@ cython_debug/
 
 .parcel-cache/
 
-db.sqlite3
-
 .idea/
-
-media/
 /node_modules/
 
 staticfiles/
 
 data.json
+
+
