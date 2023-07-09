@@ -15,10 +15,6 @@
 
 ## Как запустить dev-версию сайта
 
-Для запуска сайта нужно запустить **одновременно** бэкенд и фронтенд, в двух терминалах.
-
-### Как собрать бэкенд
-
 Скачайте код:
 ```sh
 git clone https://github.com/devmanorg/star-burger.git
@@ -39,20 +35,6 @@ python --version
 
 Возможно, вместо команды `python` здесь и в остальных инструкциях этого README придётся использовать `python3`. Зависит это от операционной системы и от того, установлен ли у вас Python старой второй версии.
 
-В каталоге проекта создайте виртуальное окружение:
-```sh
-python -m venv venv
-```
-Активируйте его. На разных операционных системах это делается разными командами:
-
-- Windows: `.\venv\Scripts\activate`
-- MacOS/Linux: `source venv/bin/activate`
-
-
-Установите зависимости в виртуальное окружение:
-```sh
-pip install -r requirements.txt
-```
 
 Определите переменную окружения `SECRET_KEY`. Создать файл `.env` в каталоге `star_burger/` и положите туда такой код:
 ```sh
@@ -61,82 +43,18 @@ GEOCODE_APIKEY=thisisgooglekeywegjiewrjgijewrgo
 ROLLBAR_ACCESS_TOKEN=thisisrollbaraccesstoken
 ```
 
-Определите переменную окружения `GEOCODE_APIKEY`. Создать файлы `.env` в каталогах `foodcartapp/` и `restaurateur/` и положите туда такой код:
-```sh
-GEOCODE_APIKEY=thisisgooglekeywegjiewrjgijewrgo
-```
-
-Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
-
-```sh
-python manage.py migrate
-```
 
 Запустите сервер:
 
 ```sh
-python manage.py runserver
+cd infra/
+docker-compose up
 ```
 
 Откройте сайт в браузере по адресу [http://127.0.0.1:8000/](http://127.0.0.1:8000/). Если вы увидели пустую белую страницу, то не пугайтесь, выдохните. Просто фронтенд пока ещё не собран. Переходите к следующему разделу README.
 
-### Собрать фронтенд
-
-**Откройте новый терминал**. Для работы сайта в dev-режиме необходима одновременная работа сразу двух программ `runserver` и `parcel`. Каждая требует себе отдельного терминала. Чтобы не выключать `runserver` откройте для фронтенда новый терминал и все нижеследующие инструкции выполняйте там.
-
-[Установите Node.js](https://nodejs.org/en/), если у вас его ещё нет.
-
-Проверьте, что Node.js и его пакетный менеджер корректно установлены. Если всё исправно, то терминал выведет их версии:
-
-```sh
-nodejs --version
-# v12.18.2
-# Если ошибка, попробуйте node:
-node --version
-# v12.18.2
-
-npm --version
-# 6.14.5
-```
-
-Версия `nodejs` должна быть не младше 10.0. Версия `npm` не важна. Как обновить Node.js читайте в статье: [How to Update Node.js](https://phoenixnap.com/kb/update-node-js-version).
-
-Перейдите в каталог проекта и установите пакеты Node.js:
-
-```sh
-cd star-burger
-npm ci --dev
-```
-
-Команда `npm ci` создаст каталог `node_modules` и установит туда пакеты Node.js. Получится аналог виртуального окружения как для Python, но для Node.js.
-
-Помимо прочего будет установлен [Parcel](https://parceljs.org/) — это упаковщик веб-приложений, похожий на [Webpack](https://webpack.js.org/). В отличии от Webpack он прост в использовании и совсем не требует настроек.
-
-Теперь запустите сборку фронтенда и не выключайте. Parcel будет работать в фоне и следить за изменениями в JS-коде:
-
-```sh
-./node_modules/.bin/parcel watch bundles-src/index.js --dist-dir bundles --public-url="./"
-```
-
-Если вы на Windows, то вам нужна та же команда, только с другими слешами в путях:
-
-```sh
-.\node_modules\.bin\parcel watch bundles-src/index.js --dist-dir bundles --public-url="./"
-```
-
-Дождитесь завершения первичной сборки. Это вполне может занять 10 и более секунд. О готовности вы узнаете по сообщению в консоли:
-
-```
-✨  Built in 10.89s
-```
-
-Parcel будет следить за файлами в каталоге `bundles-src`. Сначала он прочитает содержимое `index.js` и узнает какие другие файлы он импортирует. Затем Parcel перейдёт в каждый из этих подключенных файлов и узнает что импортируют они. И так далее, пока не закончатся файлы. В итоге Parcel получит полный список зависимостей. Дальше он соберёт все эти сотни мелких файлов в большие бандлы `bundles/index.js` и `bundles/index.css`. Они полностью самодостаточно и потому пригодны для запуска в браузере. Именно эти бандлы сервер отправит клиенту.
-
-Теперь если зайти на страницу  [http://127.0.0.1:8000/](http://127.0.0.1:8000/), то вместо пустой страницы вы увидите:
 
 ![](https://dvmn.org/filer/canonical/1594651900/687/)
-
-Каталог `bundles` в репозитории особенный — туда Parcel складывает результаты своей работы. Эта директория предназначена исключительно для результатов сборки фронтенда и потому исключёна из репозитория с помощью `.gitignore`.
 
 **Сбросьте кэш браузера <kbd>Ctrl-F5</kbd>.** Браузер при любой возможности старается кэшировать файлы статики: CSS, картинки и js-код. Порой это приводит к странному поведению сайта, когда код уже давно изменился, но браузер этого не замечает и продолжает использовать старую закэшированную версию. В норме Parcel решает эту проблему самостоятельно. Он следит за пересборкой фронтенда и предупреждает JS-код в браузере о необходимости подтянуть свежий код. Но если вдруг что-то у вас идёт не так, то начните ремонт со сброса браузерного кэша, жмите <kbd>Ctrl-F5</kbd>.
 
@@ -148,10 +66,6 @@ Parcel будет следить за файлами в каталоге `bundle
 
 ## Как запустить prod-версию сайта
 
-Для запуска сайта нужно запустить **одновременно** бэкенд и фронтенд, в двух терминалах.
-
-### Как собрать бэкенд
-
 Скачайте код:
 ```sh
 git clone https://github.com/devmanorg/star-burger.git
@@ -171,21 +85,6 @@ python --version
 **Важно!** Версия Python должна быть не ниже 3.6.
 
 Возможно, вместо команды `python` здесь и в остальных инструкциях этого README придётся использовать `python3`. Зависит это от операционной системы и от того, установлен ли у вас Python старой второй версии.
-
-В каталоге проекта создайте виртуальное окружение:
-```sh
-python -m venv venv
-```
-Активируйте его. На разных операционных системах это делается разными командами:
-
-- Windows: `.\venv\Scripts\activate`
-- MacOS/Linux: `source venv/bin/activate`
-
-
-Установите зависимости в виртуальное окружение:
-```sh
-pip install -r requirements.txt
-```
 
 Определите переменную окружения `SECRET_KEY`. Создать файл `.env` в каталоге `star_burger/` и положите туда такой код:
 ```
@@ -198,49 +97,6 @@ ROLLBAR_ENABLED=True
 DATABASE_URL=thisisdatabaseurl
 ```
 
-Определите переменную окружения `GEOCODE_APIKEY`. Создать файлы `.env` в каталогах `foodcartapp/` и `restaurateur/` и положите туда такой код:
-```
-GEOCODE_APIKEY=thisisgooglekeywegjiewrjgijewrgo
-```
-
-Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
-
-```sh
-python manage.py migrate
-```
-
-Создать daemon который будет держать сайт включенным всегда:
-
-- создание service файла
-```shell
-nano /etc/systemd/system/star-burger.service
-```
-
-- наполнение service файла
-```
-[Unit]
-Description=This is Django website burger restaurant
-After=network.target
-
-Requires=postgresql.service
-
-[Service]
-User=root
-Group=root
-WorkingDirectory=/path/to/project/folder/
-Environment="DJ_DEBUG=False"
-Environment="DJ_ALLOWED_HOSTS=<your host>"
-ExecStart=/path/to/project/folder/venv/bin/gunicorn -b 127.0.0.1:8080 --workers 3 star_burger.wsgi:application
-ExecReload=/bin/kill -s HUP $MAINPID
-KillMode=mixed
-TimeoutStopSec=5
-PrivateTmp=true
-Restart=on-failure
-RestartSec=2
-
-[Install]
-WantedBy=multi-user.target
-```
 
 Установите и запустите nginx:
 ```shell
@@ -250,45 +106,15 @@ sudo systemctl start nginx
 sudo systemctl enable nginx
 ```
 
-Создать nginx файл:
-
-- создание файла
-```shell
-nano /etc/nginx/sites-enabled/django-rep-2.conf
-```
-
-- наполнение файла
-```
-server {
-  listen your domain:80;
-
-  location / {
-    include '/etc/nginx/proxy_params';
-    proxy_pass http://127.0.0.1:8080/;
-  }
-
-  location /static/ {
-    alias '/path/to/static/files/';
-  }
-
-  location /media/ {
-    alias '/path/to/media/files/';
-  }
-}
-```
 
 Запустите сервер:
 
 ```sh
-systemctl reload nginx
-systemctl start star-burger
+cd infra/
+docker-compose -f docker-compose-prod.yml up
 ```
 
 Откройте сайт в браузере по адресу [http://your_domain:80/](http://your_domain:80/). Если вы увидели пустую белую страницу, то не пугайтесь, выдохните. Просто фронтенд пока ещё не собран. Переходите к следующему разделу README.
-
-### Собрать фронтенд
-
-Фронтенд собирается также, как и в dev-версии сайта
 
 ### Чтобы обновить код на сервере, запустите этот скрипт:
 
