@@ -1,0 +1,7 @@
+.gitignore
+db.sqlite3
+data.json
+.parcel-cache/
+.git/
+.editorconfig
+*.env
