@@ -15,5 +15,8 @@ spec:
             - name: star-burger-container
               image: star-burger-image:fullstack
               imagePullPolicy: IfNotPresent
+              envFrom:
+                - configMapRef:
+                    name: star-burger-configmap
               command: ["python", "manage.py", "clearsessions"]
           restartPolicy: Never
