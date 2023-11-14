@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: star-burger-container
-          image: star-burger-image:fullstack
-          imagePullPolicy: IfNotPresent
+          image: airguyone/star-burger-image:latest
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: star-burger-configmap
@@ -24,21 +24,21 @@ spec:
             - containerPort: 8000
               name: gunicorn
 ---
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: django-migrate
-spec:
-  ttlSecondsAfterFinished: 50
-  backoffLimit: 3
-  template:
-    spec:
-      containers:
-      - name: star-burger-container
-        image: star-burger-image:fullstack
-        imagePullPolicy: IfNotPresent
-        envFrom:
-          - configMapRef:
-              name: star-burger-configmap
-        command: ["python", "manage.py", "migrate", "--no-input"]
-      restartPolicy: Never
+#apiVersion: batch/v1
+#kind: Job
+#metadata:
+#  name: django-migrate
+#spec:
+#  ttlSecondsAfterFinished: 50
+#  backoffLimit: 3
+#  template:
+#    spec:
+#      containers:
+#      - name: star-burger-container
+#        image: airguyone/star-burger-image:latest
+#        imagePullPolicy: IfNotPresent
+#        envFrom:
+#          - configMapRef:
+#              name: star-burger-configmap
+#        command: ["python", "manage.py", "migrate", "--no-input"]
+#      restartPolicy: Never

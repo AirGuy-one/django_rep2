@@ -86,41 +86,17 @@ python --version
 
 Возможно, вместо команды `python` здесь и в остальных инструкциях этого README придётся использовать `python3`. Зависит это от операционной системы и от того, установлен ли у вас Python старой второй версии.
 
-Определите переменную окружения `SECRET_KEY`. Создать файл `.env` в каталоге `star_burger/` и положите туда такой код:
-```
-GEOCODE_APIKEY=thisisgeocodeapikey
-SECRET_KEY=thisisdjangosecretkey
-ALLOWED_HOSTS=thisisallowhost
-DEBUG=True
-ROLLBAR_ACCESS_TOKEN=thisisrollbaraccesstoken
-ROLLBAR_ENABLED=True
-DATABASE_URL=thisisdatabaseurl
-```
-
-
-Установите и запустите nginx:
+Примените к нужному namespace в kubernetes следующие команды:
 ```shell
-sudo apt-get update
-sudo apt-get install nginx
-sudo systemctl start nginx
-sudo systemctl enable nginx
+kubectl apply -f app-deployment.yml
+kubectl apply -f app-clearsessions.yml
+kubectl apply -f app-deployment.yml
+kubectl apply -f app-ingress.yml
+kubectl apply -f postgresql-service.yml
+kubectl apply -f postgresql-stateful.yml
 ```
 
-
-Запустите сервер:
-
-```sh
-cd infra/
-docker-compose -f docker-compose-prod.yml up
-```
-
-Откройте сайт в браузере по адресу [http://your_domain:80/](http://your_domain:80/). Если вы увидели пустую белую страницу, то не пугайтесь, выдохните. Просто фронтенд пока ещё не собран. Переходите к следующему разделу README.
-
-### Чтобы обновить код на сервере, запустите этот скрипт:
-
-```sh
-./star-burger-script
-```
+Откройте сайт в браузере по адресу [http://star-burger.test:8000/](http://your_domain:80/).
 
 ## Цели проекта
 

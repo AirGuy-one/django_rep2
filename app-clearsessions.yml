@@ -13,7 +13,7 @@ spec:
         spec:
           containers:
             - name: star-burger-container
-              image: star-burger-image:fullstack
+              image: airguyone/star-burger-image:latest
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:
